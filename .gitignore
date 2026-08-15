@@ -1,0 +1,43 @@
+# ========================
+# Android / Android Studio
+# ========================
+
+.gradle/
+.idea/
+*.iml
+local.properties
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Android signing keys
+*.jks
+*.keystore
+
+# ========================
+# Python / Flask
+# ========================
+
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+
+.env
+.env.*
+
+# ========================
+# Operating system
+# ========================
+
+Thumbs.db
+.DS_Store
+
+# ========================
+# IDE / temporary files
+# ========================
+
+*.log
+*.tmp
