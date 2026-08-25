@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.thanhbinh.englishaiapp.presentation.screens.HomeScreen.HomeScreen
+import com.thanhbinh.englishaiapp.presentation.screens.Screens_Chat.ChatAIScreen
 import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.CameraScreen
 import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.ScanResultScreen
 import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.ScanScreen
@@ -37,9 +38,17 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
             )
         }
 
-        // --- 2. CÁC MÀN HÌNH TẠM THỜI (PLACEHOLDER DÀNH CHO CÁC MÀN CHƯA LÀM) ---
+        // --- 2. CÁC MÀN HÌNH CHỨC NĂNG ---
         composable(Screen.Translate.route) { PlaceholderScreen("Màn hình Dịch") }
-        composable(Screen.ChatAI.route) { PlaceholderScreen("Màn hình Chat AI") }
+        composable(Screen.ChatAI.route) {
+            ChatAIScreen(
+                onNavigateBack = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                }
+            )
+        }
         composable(Screen.Library.route) { PlaceholderScreen("Màn hình Từ vựng") }
 
         // --- 3. MÀN HÌNH DANH SÁCH CÁC FILE ĐÃ QUÉT ---

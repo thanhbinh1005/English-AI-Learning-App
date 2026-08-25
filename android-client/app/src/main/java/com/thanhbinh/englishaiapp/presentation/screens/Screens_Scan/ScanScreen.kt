@@ -97,19 +97,76 @@ fun ScanScreen(
         }
 
         // 4. Danh sách các file đã quét
-        items(scannedDocs) { doc ->
-            ScannedFileItem(
-                doc = doc,
-                onDelete = { viewModel.deleteDocument(doc) },
-                onViewClick = {
-                    // 1. Mã hóa nội dung để URL không bị lỗi nếu văn bản có dấu cách/xuống dòng
-                    val encodedContent = URLEncoder.encode(doc.content, "UTF-8")
-
-                    // 2. QUAN TRỌNG: Truyền ID của tệp này qua tham số docId
-                    // Cấu trúc: Route + /Nội_dung?docId=Số_ID
-                    navController.navigate(Screen.ScanResult.route + "/${encodedContent}?docId=${doc.id}")
+        if (scannedDocs.isEmpty()) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Chưa có tài liệu nào",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Chụp tài liệu mới bằng camera hoặc mở văn bản mẫu để trải nghiệm tính năng Tóm tắt bằng AI (Llama 3.1).",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 16.sp
+                        )
+                        Spacer(modifier = Modifier.height(14.dp))
+                        Button(
+                            onClick = {
+                                val sampleText = """
+                                Artificial intelligence (AI) is transforming language learning by providing personalized, interactive, and adaptive learning experiences.
+                                With large language models like Llama 3.1, learners can practice natural conversations, ask grammar questions, and receive instant explanations.
+                                AI can summarize lengthy documents, highlight key points, and extract important vocabulary for learners.
+                                Moreover, automated speech recognition and text-to-speech tools enable students to practice listening and pronunciation anywhere, anytime.
+                                While AI cannot completely replace human interaction, it serves as a powerful 24/7 tutor that accelerates fluency and confidence.
+                                """.trimIndent()
+                                val encodedSample = URLEncoder.encode(sampleText, "UTF-8")
+                                navController.navigate(Screen.ScanResult.route + "/${encodedSample}?docId=0")
+                            },
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Mở văn bản mẫu thử Tóm tắt AI", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
-            )
+            }
+        } else {
+            items(scannedDocs) { doc ->
+                ScannedFileItem(
+                    doc = doc,
+                    onDelete = { viewModel.deleteDocument(doc) },
+                    onViewClick = {
+                        // 1. Mã hóa nội dung để URL không bị lỗi nếu văn bản có dấu cách/xuống dòng
+                        val encodedContent = URLEncoder.encode(doc.content, "UTF-8")
+
+                        // 2. QUAN TRỌNG: Truyền ID của tệp này qua tham số docId
+                        // Cấu trúc: Route + /Nội_dung?docId=Số_ID
+                        navController.navigate(Screen.ScanResult.route + "/${encodedContent}?docId=${doc.id}")
+                    }
+                )
+            }
         }
     }
 }
