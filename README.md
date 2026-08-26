@@ -112,24 +112,7 @@ Server hỗ trợ chạy trực tiếp với thư viện chuẩn của Python (k
 
 ---
 
-## 🎯 Hướng dẫn trải nghiệm 2 Use Case AI trên App
 
-### 1. Use case: “Chat với AI” (Trợ lý AI Ngôn ngữ)
-1. Tại màn hình chính, nhấn vào card **"Trợ lý Chat AI"** (hoặc chọn tab **Chat AI** ở thanh điều hướng dưới cùng).
-2. Nhập câu hỏi vào ô *"Nhập tin nhắn..."* (ví dụ: *"hiện tại đơn là thì như nào"*, *"dạy mình 5 từ vựng giao tiếp"*, *"sửa lỗi câu: I goes to school"*) hoặc nhấn vào các thẻ gợi ý nhanh.
-3. Tin nhắn người dùng xuất hiện ở **bong bóng màu tím bên phải**.
-4. Hiệu ứng *"AI đang suy nghĩ..."* kích hoạt trong khi Llama 3.1 xử lý.
-5. Câu trả lời của AI xuất hiện ở **bong bóng bên trái**, danh sách tự động cuộn xuống dưới cùng.
-6. Chạm vào bất kỳ tin nhắn nào để sao chép nhanh vào bộ nhớ tạm.
-
-### 2. Use case: “Tóm tắt văn bản bằng AI”
-1. Chọn tab **"Quét"** ở thanh điều hướng dưới cùng.
-2. Nhấn **"QUÉT TÀI LIỆU MỚI"** (để trích xuất ảnh) hoặc nhấn **"Mở văn bản mẫu thử Tóm tắt AI"** / nhấn **"Xem"** trên một tệp có sẵn.
-3. Tại màn hình **Chi tiết văn bản**, nhấn vào tab **"Tóm tắt AI"**.
-4. Ứng dụng hiển thị hiệu ứng vòng xoay tải ngầm và gửi văn bản tới server.
-5. Mô hình Llama 3.1 phân tích ngữ nghĩa và trả về các luận điểm chính dạng gạch đầu dòng rõ ràng, trực quan.
-
----
 
 ## 🏗️ Cấu trúc thư mục dự án
 
