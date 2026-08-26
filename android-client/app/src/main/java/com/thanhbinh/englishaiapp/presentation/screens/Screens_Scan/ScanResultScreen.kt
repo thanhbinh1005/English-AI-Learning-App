@@ -8,7 +8,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -61,7 +62,14 @@ fun ScanResultScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var summaryText by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var showServerConfigDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+
+    if (showServerConfigDialog) {
+        com.thanhbinh.englishaiapp.presentation.components.ServerConfigDialog(
+            onDismissRequest = { showServerConfigDialog = false }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -69,10 +77,17 @@ fun ScanResultScreen(
                 title = { Text("Chi tiết văn bản", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showServerConfigDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Cấu hình Server",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     TextButton(onClick = {
                         viewModel.saveNewDocument(fileName, textState, "Word") {
                             Toast.makeText(context, "Đã lưu tệp mới!", Toast.LENGTH_SHORT).show()
@@ -101,7 +116,7 @@ fun ScanResultScreen(
                 TabButton("Nguyên bản", selectedTab == 0, Modifier.weight(1f)) { selectedTab = 0 }
                 TabButton("Tóm tắt AI", selectedTab == 1, Modifier.weight(1f)) {
                     selectedTab = 1
-                    if (summaryText.isEmpty() && !isLoading) {
+                    if ((summaryText.isEmpty() || summaryText.startsWith("Lỗi kết nối")) && !isLoading) {
                         isLoading = true
                         viewModel.summarizeText(textState) { result ->
                             summaryText = result
@@ -121,7 +136,20 @@ fun ScanResultScreen(
             ) {
                 Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                     if (isLoading) {
-                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Đang phân tích & tóm tắt với Llama 3.1...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     } else {
                         // SỬA: Dùng TextField thay vì Text để người dùng có thể sửa
                         TextField(

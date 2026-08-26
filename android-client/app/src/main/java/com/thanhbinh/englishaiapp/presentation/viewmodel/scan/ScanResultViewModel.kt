@@ -94,57 +94,29 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
     fun summarizeText(text: String, onResult: (String) -> Unit) {
         if (text.isBlank()) return onResult("Văn bản rỗng")
 
-        val client = OkHttpClient()
-
-        // Gọi từ file cấu hình, không viết chết URL ở đây nữa
-        val url = AppConfig.SUMMARIZE_URL
-
         val jsonBody = JSONObject().apply {
             put("text", text)
         }
 
-        val request = Request.Builder()
-            .url(url)
-            .post(jsonBody.toString().toRequestBody("application/json".toMediaType()))
-            .build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    // In lỗi ra Logcat để kiểm tra trên máy tính
-                    Log.e("FLASK_ERROR", "--- LỖI KẾT NỐI API LOCAL ---")
-                    e.printStackTrace()
-
-                    Handler(Looper.getMainLooper()).post {
-                        onResult("Lỗi kết nối máy chủ: ${e.message}")
-                    }
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    val responseBody = response.body?.string()
-                    // In log phản hồi từ Flask ra Console máy tính
-                    Log.d("FLASK_DEBUG", "Status: ${response.code}, Body: $responseBody")
-
-                    if (response.isSuccessful && responseBody != null) {
-                        try {
-                            val jsonResponse = JSONObject(responseBody)
-                            // Lấy giá trị từ key 'summary' mà Flask trả về
-                            val result = jsonResponse.getString("summary")
-
-                            Handler(Looper.getMainLooper()).post {
-                                onResult(result.trim())
-                            }
-                        } catch (e: Exception) {
-                            Handler(Looper.getMainLooper()).post {
-                                onResult("Lỗi phân tích dữ liệu từ Python")
-                            }
-                        }
+        AppConfig.sendPostRequestWithFallback(
+            endpointPath = "/summarize",
+            jsonPayload = jsonBody,
+            onSuccess = { responseBody ->
+                try {
+                    val jsonResponse = JSONObject(responseBody)
+                    val result = jsonResponse.optString("summary", jsonResponse.optString("response", ""))
+                    if (result.isNotBlank()) {
+                        onResult(result.trim())
                     } else {
-                        Handler(Looper.getMainLooper()).post {
-                            onResult("Lỗi Server Flask (${response.code})")
-                        }
+                        onResult("Không nhận được nội dung tóm tắt từ server.")
                     }
+                } catch (e: Exception) {
+                    onResult("Lỗi phân tích dữ liệu từ Python: ${e.message}")
                 }
-            })
-
+            },
+            onFailure = { errorMsg ->
+                onResult(errorMsg)
+            }
+        )
     }
 }
