@@ -23,9 +23,12 @@ import org.json.JSONArray
         DeckEntity::class,
         CardEntity::class,
         ReviewEntity::class,
-        HistoryEntity::class
+        HistoryEntity::class,
+        CollectionEntity::class,
+        VocabularyEntity::class,
+        HistoryItem::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -37,10 +40,19 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun cardDao(): CardDao
     abstract fun reviewDao(): ReviewDao
     abstract fun historyDao(): HistoryDao
+    abstract fun collectionDao(): CollectionDao
+    abstract fun vocabularyDao(): VocabularyDao
+    abstract fun translationHistoryDao(): TranslationHistoryDao
 
     companion object {
         @Volatile
         private var INSTANCE: AppDatabase? = null
+
+        @JvmField
+        val databaseWriteExecutor: java.util.concurrent.ExecutorService = java.util.concurrent.Executors.newFixedThreadPool(4)
+
+        @JvmStatic
+        fun getInstance(context: Context): AppDatabase = getDatabase(context)
 
         private val dbScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 

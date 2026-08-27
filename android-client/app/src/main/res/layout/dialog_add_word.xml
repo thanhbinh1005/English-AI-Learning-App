@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/edtTerm"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Từ mới (Ví dụ: Entrepreneur)"
+        android:inputType="textCapWords"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0F172A"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/edtMeaning"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="Định nghĩa / Nghĩa Tiếng Việt"
+        android:inputType="text"
+        android:paddingHorizontal="16dp"
+        android:textColor="#0F172A"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/edtExample"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_input_field"
+        android:gravity="top|start"
+        android:hint="Ví dụ minh họa (Không bắt buộc)"
+        android:inputType="textMultiLine"
+        android:padding="16dp"
+        android:textColor="#0F172A"
+        android:textSize="14sp" />
+
+</LinearLayout>

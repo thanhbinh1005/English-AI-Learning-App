@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.EnglishAIApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.EnglishAIApp" parent="Theme.Material3.DayNight.NoActionBar" />
 
     <!-- Style dành riêng cho Thư viện Cắt ảnh (Bắt buộc dùng AppCompat) -->
     <style name="Theme.App.Cropper" parent="Theme.AppCompat.Light.DarkActionBar" />

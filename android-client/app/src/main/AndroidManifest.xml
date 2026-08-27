@@ -46,6 +46,21 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".CollectionDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EnglishAIApp" />
+
+        <activity
+            android:name=".FlashcardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EnglishAIApp" />
+
+        <activity
+            android:name=".NewCollectionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EnglishAIApp" />
+
     </application>
 
 </manifest>

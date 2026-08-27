@@ -1,5 +1,6 @@
 package com.thanhbinh.englishaiapp.presentation.navigation
 
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,6 +22,8 @@ import com.thanhbinh.englishaiapp.presentation.screens.Screens_Chat.ChatAIScreen
 import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.CameraScreen
 import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.ScanResultScreen
 import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.ScanScreen
+import com.thanhbinh.englishaiapp.ui.fragment.TranslateFragment
+import com.thanhbinh.englishaiapp.ui.fragment.VocabularyFragment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +44,7 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
         }
 
         // --- 2. CÁC MÀN HÌNH CHỨC NĂNG ---
-        composable(Screen.Translate.route) { PlaceholderScreen("Màn hình Dịch") }
+        composable(Screen.Translate.route) { TranslateScreen() }
         composable(Screen.ChatAI.route) {
             ChatAIScreen(
                 onNavigateBack = {
@@ -49,7 +54,7 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
                 }
             )
         }
-        composable(Screen.Library.route) { PlaceholderScreen("Màn hình Từ vựng") }
+        composable(Screen.Library.route) { VocabularyScreen() }
 
         // --- 3. MÀN HÌNH DANH SÁCH CÁC FILE ĐÃ QUÉT ---
         composable(Screen.Scan.route) {
@@ -101,6 +106,60 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
             )
         }
     }
+}
+
+@Composable
+fun TranslateScreen() {
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { context ->
+            FragmentContainerView(context).apply {
+                id = com.thanhbinh.englishaiapp.R.id.translate_fragment_container
+                layoutParams = android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            }
+        },
+        update = { view ->
+            val activity = view.context as? AppCompatActivity
+            val fm = activity?.supportFragmentManager ?: return@AndroidView
+            val existing = fm.findFragmentById(view.id)
+            if (existing != null) {
+                fm.beginTransaction().remove(existing).commitNowAllowingStateLoss()
+            }
+            fm.beginTransaction()
+                .replace(view.id, TranslateFragment(), "TranslateFragment")
+                .commitAllowingStateLoss()
+        }
+    )
+}
+
+@Composable
+fun VocabularyScreen() {
+    AndroidView(
+        modifier = Modifier.fillMaxSize(),
+        factory = { context ->
+            FragmentContainerView(context).apply {
+                id = com.thanhbinh.englishaiapp.R.id.vocabulary_fragment_container
+                layoutParams = android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                )
+            }
+        },
+        update = { view ->
+            val activity = view.context as? AppCompatActivity
+            val fm = activity?.supportFragmentManager ?: return@AndroidView
+            val existing = fm.findFragmentById(view.id)
+            if (existing != null) {
+                fm.beginTransaction().remove(existing).commitNowAllowingStateLoss()
+            }
+            fm.beginTransaction()
+                .replace(view.id, VocabularyFragment(), "VocabularyFragment")
+                .commitAllowingStateLoss()
+        }
+    )
 }
 
 @Composable

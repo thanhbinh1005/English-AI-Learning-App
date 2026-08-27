@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.thanhbinh.englishaiapp"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.thanhbinh.englishaiapp"
@@ -31,6 +31,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 }
 
@@ -49,8 +50,16 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
 
+    implementation("androidx.compose.ui:ui-viewbinding")
+
     // ML Kit
     implementation(libs.mlkit.text.recognition)
+    implementation("com.google.mlkit:translate:17.0.3")
+    implementation("com.google.mlkit:language-id:17.0.5")
+
+    // Material & ConstraintLayout
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
     // CameraX
     val cameraxVersion = "1.4.1"
