@@ -35,6 +35,9 @@ public interface CollectionDao {
     @Query("SELECT * FROM collections WHERE id = :id LIMIT 1")
     LiveData<CollectionEntity> getCollectionById(long id);
 
+    @Query("SELECT * FROM collections WHERE name = :name LIMIT 1")
+    CollectionEntity getCollectionByName(String name);
+
     @Query("SELECT COUNT(*) FROM collections")
     LiveData<Integer> getTotalCollectionsCount();
 }

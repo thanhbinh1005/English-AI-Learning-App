@@ -33,9 +33,16 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
     val currentDocId = _currentDocId.asStateFlow()
 
     // HÀM 1: LƯU MỚI HOÀN TOÀN (Ép buộc tạo dòng mới)
-    fun saveNewDocument(name: String, content: String, type: String, onSuccess: () -> Unit) {
+    fun saveNewDocument(name: String, content: String, type: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         viewModelScope.launch {
             try {
+                // Kiểm tra trùng tên
+                val existingDoc = scanDao.getDocByTitle(name)
+                if (existingDoc != null) {
+                    onFailure("Tên tệp đã tồn tại. Vui lòng chọn tên khác.")
+                    return@launch
+                }
+
                 val newDoc = ScannedDocEntity(
                     id = 0, // ID 0 để Room tự sinh ID mới
                     fileName = name,
@@ -55,12 +62,19 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     // HÀM 2: CẬP NHẬT (Chỉ ghi đè lên file đang mở)
-    fun updateCurrentDocument(name: String, content: String, type: String, onSuccess: () -> Unit) {
+    fun updateCurrentDocument(name: String, content: String, type: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         val id = _currentDocId.value
         if (id == 0) return // Không có ID thì không cập nhật
 
         viewModelScope.launch {
             try {
+                // Kiểm tra xem tên mới có bị trùng với file KHÁC không
+                val docWithSameName = scanDao.getDocByTitle(name)
+                if (docWithSameName != null && docWithSameName.id != id) {
+                    onFailure("Tên tệp đã tồn tại. Vui lòng chọn tên khác.")
+                    return@launch
+                }
+
                 val existingDoc = scanDao.getDocById(id)
                 if (existingDoc != null) {
                     val updatedDoc = existingDoc.copy(

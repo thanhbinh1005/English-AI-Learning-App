@@ -134,9 +134,17 @@ public class NewCollectionActivity extends AppCompatActivity {
 
         if (name.isEmpty()) return;
 
-        CollectionEntity collection = new CollectionEntity(name, description, selectedColorHex, System.currentTimeMillis());
-
         AppDatabase.databaseWriteExecutor.execute(() -> {
+            // Kiểm tra trùng tên bộ sưu tập
+            CollectionEntity existing = AppDatabase.getInstance(getApplicationContext()).collectionDao().getCollectionByName(name);
+            if (existing != null) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Tên bộ sưu tập đã tồn tại. Vui lòng chọn tên khác.", Toast.LENGTH_LONG).show();
+                });
+                return;
+            }
+
+            CollectionEntity collection = new CollectionEntity(name, description, selectedColorHex, System.currentTimeMillis());
             AppDatabase.getInstance(getApplicationContext()).collectionDao().insert(collection);
             runOnUiThread(() -> {
                 Toast.makeText(this, "Đã tạo bộ sưu tập mới!", Toast.LENGTH_SHORT).show();

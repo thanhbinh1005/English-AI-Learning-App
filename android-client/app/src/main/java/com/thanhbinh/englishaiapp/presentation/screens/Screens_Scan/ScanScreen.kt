@@ -51,6 +51,41 @@ fun ScanScreen(
     // Thu thập dữ liệu từ Database dưới dạng State để giao diện tự cập nhật
     val scannedDocs by viewModel.allDocs.collectAsState(initial = emptyList())
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var docToDelete by remember { mutableStateOf<ScannedDocEntity?>(null) }
+
+    if (showDeleteDialog && docToDelete != null) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+                docToDelete = null
+            },
+            title = { Text("Xác nhận xóa", fontWeight = FontWeight.Bold) },
+            text = { Text("Bạn có chắc chắn muốn xóa tài liệu \"${docToDelete?.fileName}\" không? Thao tác này không thể hoàn tác.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        docToDelete?.let { viewModel.deleteDocument(it) }
+                        showDeleteDialog = false
+                        docToDelete = null
+                    }
+                ) {
+                    Text("Xóa", color = Color.Red, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        docToDelete = null
+                    }
+                ) {
+                    Text("Hủy")
+                }
+            }
+        )
+    }
+
 
     // Dùng LazyColumn để toàn bộ màn hình có thể cuộn được
     LazyColumn(
@@ -156,7 +191,10 @@ fun ScanScreen(
             items(scannedDocs) { doc ->
                 ScannedFileItem(
                     doc = doc,
-                    onDelete = { viewModel.deleteDocument(doc) },
+                    onDelete = {
+                        docToDelete = doc
+                        showDeleteDialog = true
+                    },
                     onViewClick = {
                         // 1. Mã hóa nội dung để URL không bị lỗi nếu văn bản có dấu cách/xuống dòng
                         val encodedContent = URLEncoder.encode(doc.content, "UTF-8")

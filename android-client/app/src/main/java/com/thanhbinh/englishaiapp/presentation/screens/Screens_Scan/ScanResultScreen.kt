@@ -89,9 +89,15 @@ fun ScanResultScreen(
                         )
                     }
                     TextButton(onClick = {
-                        viewModel.saveNewDocument(fileName, textState, "Word") {
-                            Toast.makeText(context, "Đã lưu tệp mới!", Toast.LENGTH_SHORT).show()
-                        }
+                        viewModel.saveNewDocument(fileName, textState, "Word",
+                            onSuccess = {
+                                Toast.makeText(context, "Đã lưu tệp mới!", Toast.LENGTH_SHORT).show()
+                                onNavigateBack()
+                            },
+                            onFailure = { errorMsg ->
+                                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+                            }
+                        )
                     }) {
                         Text("LƯU MỚI", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     }
@@ -177,9 +183,15 @@ fun ScanResultScreen(
                 // Nút Cập nhật (Sửa ID logic)
                 Button(
                     onClick = {
-                        viewModel.updateCurrentDocument(fileName, textState, "Word") {
-                            Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
-                        }
+                        viewModel.updateCurrentDocument(fileName, textState, "Word",
+                            onSuccess = {
+                                Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
+                                onNavigateBack()
+                            },
+                            onFailure = { errorMsg ->
+                                Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+                            }
+                        )
                     },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),

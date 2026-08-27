@@ -1,0 +1,4 @@
+- [x] Update `CollectionDao.java` with `getCollectionByName`
+- [x] Implement duplication check in `ScanResultViewModel.kt`
+- [x] Implement duplication check in `NewCollectionActivity.java`
+- [x] Verify functionality for both files and collections
