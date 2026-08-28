@@ -43,7 +43,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="Detect Language"
+                        android:text="Nhận diện ngôn ngữ"
                         android:textColor="#0D6EFD"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -67,7 +67,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="Vietnamese"
+                        android:text="Tiếng Việt"
                         android:textColor="#0D6EFD"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -100,7 +100,9 @@
                             android:layout_height="100dp"
                             android:background="@android:color/transparent"
                             android:gravity="top|start"
-                            android:hint="Type or paste text here..."
+                            android:hint="Nhập hoặc dán văn bản tại đây..."
+                            android:importantForAutofill="no"
+                            android:inputType="textMultiLine"
                             android:textColor="#2C3E50"
                             android:textColorHint="#BDC3C7"
                             android:textSize="16sp" />
@@ -112,6 +114,7 @@
                             android:layout_alignParentEnd="true"
                             android:padding="4dp"
                             android:src="@drawable/ic_clear"
+                            android:contentDescription="Clear input"
                             android:visibility="gone" />
                     </RelativeLayout>
 
@@ -139,7 +142,7 @@
                             android:background="@drawable/bg_badge"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="2dp"
-                            android:text="Detected: English"
+                            android:text="Đã nhận diện: Tiếng Anh"
                             android:textColor="#0D6EFD"
                             android:textSize="11sp"
                             android:textStyle="bold"
@@ -154,7 +157,7 @@
                             android:id="@+id/btnTranslate"
                             android:layout_width="wrap_content"
                             android:layout_height="44dp"
-                            android:text="Translate"
+                            android:text="Dịch thuật"
                             android:textAllCaps="false"
                             android:textSize="14sp"
                             android:paddingHorizontal="20dp"
@@ -187,7 +190,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="40dp"
                         android:lineSpacingExtra="2dp"
-                        android:text="Translation will appear here..."
+                        android:text="Bản dịch sẽ xuất hiện tại đây..."
                         android:textColor="#1A237E"
                         android:textSize="16sp" />
 
@@ -217,6 +220,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:padding="6dp"
                         android:src="@drawable/ic_copy"
+                        android:contentDescription="Copy translation"
                         app:tint="#0D6EFD" />
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -227,7 +231,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="8dp"
-                android:text="Recent History"
+                android:text="Lịch sử dịch thuật"
                 android:textColor="#1A237E"
                 android:textSize="18sp"
                 android:textStyle="bold" />

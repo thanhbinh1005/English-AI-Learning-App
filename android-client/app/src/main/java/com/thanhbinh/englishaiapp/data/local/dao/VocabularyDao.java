@@ -16,6 +16,9 @@ public interface VocabularyDao {
     @Insert
     long insert(VocabularyEntity vocabulary);
 
+    @Insert
+    void insertAll(List<VocabularyEntity> vocabularies);
+
     @Update
     void update(VocabularyEntity vocabulary);
 

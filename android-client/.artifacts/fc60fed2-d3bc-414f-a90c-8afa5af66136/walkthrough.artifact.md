@@ -1,25 +1,26 @@
-# Walkthrough: Duplicate Name Validation
+# Walkthrough: UI Localization to Vietnamese
 
-I have implemented validation to prevent duplicate names for both scanned documents and collections.
+I have localized the "New Collection" and "Translate" screens to Vietnamese, including all user-facing labels, hints, language names, and status messages.
 
 ## Changes Made
 
-### Data Layer
-#### [MODIFY] [CollectionDao.java](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/data/local/dao/CollectionDao.java)
-- Added `getCollectionByName(String name)` to check for existing collections by name.
+### New Collection Screen
+- **[activity_new_collection.xml](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/res/layout/activity_new_collection.xml)**:
+    - Translated header: "Bộ sưu tập mới".
+    - Translated design labels and hints.
+    - Updated button: "Tạo bộ sưu tập".
 
-### Scanned Documents (Files)
-#### [MODIFY] [ScanResultViewModel.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/presentation/viewmodel/scan/ScanResultViewModel.kt)
-- Updated `saveNewDocument` to check if the name is already taken before inserting.
-- Updated `updateCurrentDocument` to ensure the new name isn't used by another existing document (while allowing the current document to keep its own name).
-- Added an `onFailure` callback to communicate error messages back to the UI.
-
-#### [MODIFY] [ScanResultScreen.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/presentation/screens/Screens_Scan/ScanResultScreen.kt)
-- Updated the "LƯU MỚI" and "Cập nhật file" buttons to handle validation errors by showing a Toast message.
-
-### Collections (Folders)
-#### [MODIFY] [NewCollectionActivity.java](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/NewCollectionActivity.java)
-- Updated `createCollection` to perform a check against `CollectionDao` before inserting a new collection. If the name exists, a Toast message is shown and the operation is aborted.
+### Translate Screen
+- **[fragment_translate.xml](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/res/layout/fragment_translate.xml)**:
+    - Localized default language selectors: "Nhận diện ngôn ngữ" and "Tiếng Việt".
+    - Translated input hint and history header.
+    - Updated button: "Dịch thuật".
+- **[TranslateFragment.java](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/ui/fragment/TranslateFragment.java)**:
+    - Updated language mapping logic to use Vietnamese names (e.g., "Tiếng Anh", "Tiếng Pháp").
+    - Localized all status messages: "Đang xử lý...", "Lỗi:", "Đã sao chép vào bộ nhớ tạm".
+    - Updated Speech-to-Text prompt and error messages.
+- **[bottom_sheet_languages.xml](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/res/layout/bottom_sheet_languages.xml)**:
+    - Translated title to "Chọn ngôn ngữ".
 
 ## Verification Results
 
@@ -27,5 +28,6 @@ I have implemented validation to prevent duplicate names for both scanned docume
 - Ran `app:assembleDebug`: **Build successful**.
 
 ### Manual Verification
-- Validated that trying to save a document or create a collection with an existing name triggers a clear error message.
-- Confirmed that updating a document with its current name still works as expected.
+- All UI elements in the target screens now display Vietnamese text correctly.
+- Language selection and translation logic correctly handle the new Vietnamese language names.
+- Error and success Toasts are now in Vietnamese.

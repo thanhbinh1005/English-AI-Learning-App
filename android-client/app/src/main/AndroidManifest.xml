@@ -61,6 +61,12 @@
             android:exported="false"
             android:theme="@style/Theme.EnglishAIApp" />
 
+        <activity
+            android:name=".ExpandRepositoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EnglishAIApp"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -49,7 +51,8 @@ public class TranslateFragment extends Fragment {
     private HistoryAdapter adapter;
     private List<HistoryItem> historyList = new ArrayList<>();
 
-    private static final int SPEECH_REQUEST_CODE = 100;
+    private ActivityResultLauncher<Intent> speechRecognizerLauncher;
+
     private static final int MAX_CHUNK_SIZE = 2000;
 
     private Translator translator;
@@ -64,6 +67,22 @@ public class TranslateFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentTranslateBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        speechRecognizerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                        ArrayList<String> matches = result.getData().getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                        if (matches != null && !matches.isEmpty()) {
+                            binding.etInput.setText(matches.get(0));
+                        }
+                    }
+                }
+        );
     }
 
     @Override
@@ -145,7 +164,7 @@ public class TranslateFragment extends Fragment {
         binding.btnSwapLang.setOnClickListener(v -> {
             String source = binding.tvSourceLang.getText().toString();
             String target = binding.tvTargetLang.getText().toString();
-            if (source.equals("Detect Language")) return;
+            if (source.equals("Nhận diện ngôn ngữ")) return;
 
             binding.tvSourceLang.setText(target);
             binding.tvTargetLang.setText(source);
@@ -159,13 +178,13 @@ public class TranslateFragment extends Fragment {
         RecyclerView rv = view.findViewById(R.id.rvLanguages);
 
         List<String> langs = new ArrayList<>();
-        if (isSource) langs.add("Detect Language");
-        langs.add("English");
-        langs.add("Vietnamese");
-        langs.add("French");
-        langs.add("Japanese");
-        langs.add("German");
-        langs.add("Spanish");
+        if (isSource) langs.add("Nhận diện ngôn ngữ");
+        langs.add("Tiếng Anh");
+        langs.add("Tiếng Việt");
+        langs.add("Tiếng Pháp");
+        langs.add("Tiếng Nhật");
+        langs.add("Tiếng Đức");
+        langs.add("Tiếng Tây Ban Nha");
 
         LanguageSelectionAdapter langAdapter = new LanguageSelectionAdapter(langs, lang -> {
             if (isSource) {
@@ -193,7 +212,7 @@ public class TranslateFragment extends Fragment {
                 ClipData clip = ClipData.newPlainText("Translated Text", result);
                 if (clipboard != null) {
                     clipboard.setPrimaryClip(clip);
-                    Toast.makeText(requireContext(), "Copied to clipboard", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Đã sao chép vào bộ nhớ tạm", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -213,7 +232,7 @@ public class TranslateFragment extends Fragment {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 binding.btnClear.setVisibility(s.length() > 0 ? View.VISIBLE : View.GONE);
-                if (s.length() > 5 && binding.tvSourceLang.getText().toString().equals("Detect Language")) {
+                if (s.length() > 5 && binding.tvSourceLang.getText().toString().equals("Nhận diện ngôn ngữ")) {
                     detectLanguage(s.toString());
                 }
             }
@@ -226,7 +245,7 @@ public class TranslateFragment extends Fragment {
                 .addOnSuccessListener(languageCode -> {
                     if (!languageCode.equals("und")) {
                         binding.tvAutoDetectBadge.setVisibility(View.VISIBLE);
-                        binding.tvAutoDetectBadge.setText("Detected: " + getLanguageName(languageCode));
+                        binding.tvAutoDetectBadge.setText("Đã nhận diện: " + getLanguageName(languageCode));
                     }
                 });
     }
@@ -235,22 +254,11 @@ public class TranslateFragment extends Fragment {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Listening...");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Đang lắng nghe...");
         try {
-            startActivityForResult(intent, SPEECH_REQUEST_CODE);
+            speechRecognizerLauncher.launch(intent);
         } catch (Exception e) {
-            Toast.makeText(requireContext(), "Speech-to-Text not supported", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SPEECH_REQUEST_CODE && data != null) {
-            ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            if (result != null && !result.isEmpty()) {
-                binding.etInput.setText(result.get(0));
-            }
+            Toast.makeText(requireContext(), "Tính năng nhận diện giọng nói không được hỗ trợ", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -289,7 +297,7 @@ public class TranslateFragment extends Fragment {
         if (input.isEmpty()) return;
 
         String sourceName = binding.tvSourceLang.getText().toString();
-        if (sourceName.equals("Detect Language")) {
+        if (sourceName.equals("Nhận diện ngôn ngữ")) {
             languageIdentifier.identifyLanguage(input)
                     .addOnSuccessListener(languageCode -> {
                         if (!languageCode.equals("und")) {
@@ -317,7 +325,7 @@ public class TranslateFragment extends Fragment {
 
         final Translator t = Translation.getClient(options);
         binding.btnTranslate.setEnabled(false);
-        binding.tvResult.setText("Processing...");
+        binding.tvResult.setText("Đang xử lý...");
 
         t.downloadModelIfNeeded(new DownloadConditions.Builder().build())
                 .addOnSuccessListener(unused -> {
@@ -333,7 +341,7 @@ public class TranslateFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    binding.tvResult.setText("Error: " + e.getMessage());
+                    binding.tvResult.setText("Lỗi: " + e.getMessage());
                     binding.btnTranslate.setEnabled(true);
                 });
     }
@@ -353,7 +361,7 @@ public class TranslateFragment extends Fragment {
             String finalResult = TranslationHelper.postprocessOutput(rawResult, prepResult, getLanguageCode(sourceName), getLanguageCode(targetName));
             binding.tvResult.setText(finalResult);
             binding.btnTranslate.setEnabled(true);
-            saveToHistory(fullText, finalResult, "Long Text", targetName);
+            saveToHistory(fullText, finalResult, "Văn bản dài", targetName);
         });
     }
 
@@ -375,24 +383,24 @@ public class TranslateFragment extends Fragment {
 
     private String getLanguageCode(String name) {
         switch (name) {
-            case "Vietnamese": return TranslateLanguage.VIETNAMESE;
-            case "French": return TranslateLanguage.FRENCH;
-            case "Japanese": return TranslateLanguage.JAPANESE;
-            case "German": return TranslateLanguage.GERMAN;
-            case "Spanish": return TranslateLanguage.SPANISH;
-            case "English": return TranslateLanguage.ENGLISH;
+            case "Tiếng Việt": return TranslateLanguage.VIETNAMESE;
+            case "Tiếng Pháp": return TranslateLanguage.FRENCH;
+            case "Tiếng Nhật": return TranslateLanguage.JAPANESE;
+            case "Tiếng Đức": return TranslateLanguage.GERMAN;
+            case "Tiếng Tây Ban Nha": return TranslateLanguage.SPANISH;
+            case "Tiếng Anh": return TranslateLanguage.ENGLISH;
             default: return null;
         }
     }
 
     private String getLanguageName(String code) {
         switch (code) {
-            case TranslateLanguage.VIETNAMESE: return "Vietnamese";
-            case TranslateLanguage.FRENCH: return "French";
-            case TranslateLanguage.JAPANESE: return "Japanese";
-            case TranslateLanguage.GERMAN: return "German";
-            case TranslateLanguage.SPANISH: return "Spanish";
-            case TranslateLanguage.ENGLISH: return "English";
+            case TranslateLanguage.VIETNAMESE: return "Tiếng Việt";
+            case TranslateLanguage.FRENCH: return "Tiếng Pháp";
+            case TranslateLanguage.JAPANESE: return "Tiếng Nhật";
+            case TranslateLanguage.GERMAN: return "Tiếng Đức";
+            case TranslateLanguage.SPANISH: return "Tiếng Tây Ban Nha";
+            case TranslateLanguage.ENGLISH: return "Tiếng Anh";
             default: return code;
         }
     }

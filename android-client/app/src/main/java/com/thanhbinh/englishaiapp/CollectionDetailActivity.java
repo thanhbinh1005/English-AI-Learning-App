@@ -106,7 +106,15 @@ public class CollectionDetailActivity extends AppCompatActivity implements Vocab
             public void afterTextChanged(Editable s) {}
         });
 
-        binding.fabAddWord.setOnClickListener(v -> showAddWordDialog());
+        binding.fabAddWord.setOnClickListener(v -> openExpandRepositoryActivity());
+        binding.layoutEmpty.setOnClickListener(v -> openExpandRepositoryActivity());
+    }
+
+    private void openExpandRepositoryActivity() {
+        Intent intent = new Intent(this, ExpandRepositoryActivity.class);
+        intent.putExtra("collection_id", collectionId);
+        intent.putExtra("collection_name", collectionName);
+        startActivity(intent);
     }
 
     private void observeData(String query) {
@@ -129,37 +137,6 @@ public class CollectionDetailActivity extends AppCompatActivity implements Vocab
             binding.layoutEmpty.setVisibility(View.GONE);
             binding.rvVocabularies.setVisibility(View.VISIBLE);
         }
-    }
-
-    private void showAddWordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Thêm từ vựng mới");
-
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_word, null);
-        EditText edtTerm = dialogView.findViewById(R.id.edtTerm);
-        EditText edtMeaning = dialogView.findViewById(R.id.edtMeaning);
-        EditText edtExample = dialogView.findViewById(R.id.edtExample);
-
-        builder.setView(dialogView);
-        builder.setPositiveButton("Thêm", (dialog, which) -> {
-            String term = edtTerm.getText().toString().trim();
-            String meaning = edtMeaning.getText().toString().trim();
-            String example = edtExample.getText().toString().trim();
-
-            if (term.isEmpty() || meaning.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập Từ và Nghĩa!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            VocabularyEntity vocabulary = new VocabularyEntity(collectionId, term, meaning, example, false, System.currentTimeMillis());
-            AppDatabase.databaseWriteExecutor.execute(() -> {
-                AppDatabase.getInstance(getApplicationContext()).vocabularyDao().insert(vocabulary);
-                runOnUiThread(() -> Toast.makeText(this, "Đã thêm từ vựng mới", Toast.LENGTH_SHORT).show());
-            });
-        });
-
-        builder.setNegativeButton("Hủy", null);
-        builder.show();
     }
 
     @Override

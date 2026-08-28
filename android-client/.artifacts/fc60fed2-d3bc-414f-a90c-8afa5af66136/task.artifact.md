@@ -1,4 +1,5 @@
-- [x] Update `CollectionDao.java` with `getCollectionByName`
-- [x] Implement duplication check in `ScanResultViewModel.kt`
-- [x] Implement duplication check in `NewCollectionActivity.java`
-- [x] Verify functionality for both files and collections
+- [x] Localize `activity_new_collection.xml`
+- [x] Localize `fragment_translate.xml`
+- [x] Localize `bottom_sheet_languages.xml`
+- [x] Update `TranslateFragment.java` with Vietnamese language names and status messages
+- [x] Verify build and UI consistency
