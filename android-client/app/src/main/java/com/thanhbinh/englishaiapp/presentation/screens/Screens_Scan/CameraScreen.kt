@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,13 +16,16 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -55,7 +59,7 @@ import java.io.File
 fun CameraScreen(
     onTextScanned: (String) -> Unit,
     onNavigateBack: () -> Unit,
-    viewModel: CaptureViewModel = viewModel() // Khai báo ViewModel
+    viewModel: CaptureViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -65,16 +69,22 @@ fun CameraScreen(
     val primaryColorArgb = MaterialTheme.colorScheme.primary.toArgb()
     val onPrimaryColorArgb = MaterialTheme.colorScheme.onPrimary.toArgb()
 
-    // Launcher xử lý Cắt ảnh (Chỉ lo phần UI Cắt ảnh)
+    // Launcher xử lý Cắt ảnh
     val cropImageLauncher = rememberLauncherForActivityResult(
         CropImageContract()
     ) { result ->
         if (result.isSuccessful) {
             result.uriContent?.let { uri ->
-                // ĐẨY LOGIC XỬ LÝ SANG VIEWMODEL
-                viewModel.processImage(context, uri) { scannedText ->
-                    onTextScanned(scannedText)
-                }
+                viewModel.processImage(
+                    context = context,
+                    uri = uri,
+                    onSuccess = { scannedText ->
+                        onTextScanned(scannedText)
+                    },
+                    onError = { errorMsg ->
+                        Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show()
+                    }
+                )
             }
         }
     }
@@ -84,7 +94,6 @@ fun CameraScreen(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            // Sau khi chọn ảnh xong, gửi ngay sang Launcher Cắt ảnh
             cropImageLauncher.launch(
                 CropImageContractOptions(uri, CropImageOptions(
                     guidelines = CropImageView.Guidelines.ON,
@@ -96,28 +105,25 @@ fun CameraScreen(
         }
     }
 
-    // Trạng thái quyền Camera (State động có thể cập nhật lại ngay lập tức)
+    // Trạng thái quyền Camera
     var hasPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
         )
     }
 
-    // Launcher xin quyền Camera trực tiếp trong app
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         hasPermission = isGranted
     }
 
-    // Tự động yêu cầu cấp quyền khi mở màn hình nếu chưa có quyền
     LaunchedEffect(Unit) {
         if (!hasPermission) {
             permissionLauncher.launch(Manifest.permission.CAMERA)
         }
     }
 
-    // Tự động cập nhật lại quyền khi người dùng cấp trong Cài đặt hệ thống và quay lại app
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -133,7 +139,6 @@ fun CameraScreen(
         }
     }
 
-    // Nếu chưa cấp quyền, hiển thị giao diện thông báo và nút xin cấp quyền
     if (!hasPermission) {
         CameraPermissionRationaleScreen(
             onRequestPermission = {
@@ -154,73 +159,140 @@ fun CameraScreen(
         return
     }
 
-    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
-
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // Preview Camera
+        // 1. Live Camera Preview with CameraX
         AndroidView(
             factory = { ctx ->
-                PreviewView(ctx).apply {
+                val previewView = PreviewView(ctx).apply {
                     implementationMode = PreviewView.ImplementationMode.COMPATIBLE
+                    scaleType = PreviewView.ScaleType.FILL_CENTER
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
                 }
-            },
-            modifier = Modifier.fillMaxSize(),
-            update = { previewView ->
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
                 cameraProviderFuture.addListener({
-                    val cameraProvider = cameraProviderFuture.get()
-                    val preview = androidx.camera.core.Preview.Builder().build().also {
-                        it.setSurfaceProvider(previewView.surfaceProvider)
-                    }
                     try {
+                        val cameraProvider = cameraProviderFuture.get()
+                        val preview = androidx.camera.core.Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
                         cameraProvider.unbindAll()
-                        cameraProvider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, preview, imageCapture)
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            CameraSelector.DEFAULT_BACK_CAMERA,
+                            preview,
+                            imageCapture
+                        )
                     } catch (exc: Exception) {
-                        Log.e("Camera", "Lỗi: ${exc.message}")
+                        Log.e("Camera", "Lỗi bind camera: ${exc.message}")
                     }
-                }, ContextCompat.getMainExecutor(context))
-            }
+                }, ContextCompat.getMainExecutor(ctx))
+                previewView
+            },
+            modifier = Modifier.fillMaxSize()
         )
 
-        // 2. Lớp phủ Header (Nút Back)
+        // 2. Viewfinder Target Frame (Khung căn chỉnh văn bản)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp, vertical = 120.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.6f)
+                    .border(
+                        BorderStroke(2.dp, Color.White.copy(alpha = 0.6f)),
+                        shape = RoundedCornerShape(20.dp)
+                    )
+            ) {
+                Text(
+                    text = "Căn chỉnh tài liệu cần quét vào khung",
+                    color = Color.White.copy(alpha = 0.85f),
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 12.dp)
+                        .background(Color.Black.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                )
+            }
+        }
+
+        // 3. Header Bar (Nút Back + Tiêu đề)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
                 .align(Alignment.TopStart)
                 .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             FilledIconButton(
                 onClick = onNavigateBack,
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = Color.Black.copy(alpha = 0.5f) // Nền tối mờ để nổi bật icon
+                    containerColor = Color.Black.copy(alpha = 0.5f)
                 )
             ) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White)
             }
+
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = Color.Black.copy(alpha = 0.55f),
+                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DocumentScanner,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Quét tài liệu (OCR)",
+                        color = Color.White,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.size(40.dp))
         }
 
-        // 3. Hiển thị Loading khi đang xử lý OCR
+        // 4. Hiển thị Loading khi đang xử lý OCR
         if (viewModel.isProcessing) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f)),
+                    .background(Color.Black.copy(alpha = 0.6f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Đang nhận diện...", color = Color.White)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Đang nhận diện ký tự...",
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
         }
 
-        // 4. Giao diện các nút điều khiển ở dưới cùng
+        // 5. Giao diện các nút điều khiển ở dưới cùng
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -237,14 +309,14 @@ fun CameraScreen(
                 },
                 modifier = Modifier.size(56.dp),
                 colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = Color.White.copy(alpha = 0.2f)
+                    containerColor = Color.White.copy(alpha = 0.25f)
                 ),
                 enabled = !viewModel.isProcessing
             ) {
                 Icon(Icons.Default.PhotoLibrary, contentDescription = "Gallery", tint = Color.White)
             }
 
-            // NÚT CHỤP ẢNH
+            // NÚT CHỤP ẢNH IN-APP VỚI CAMERAX
             Button(
                 onClick = {
                     val file = File(context.cacheDir, "temp_${System.currentTimeMillis()}.jpg")
@@ -255,7 +327,6 @@ fun CameraScreen(
                         ContextCompat.getMainExecutor(context),
                         object : ImageCapture.OnImageSavedCallback {
                             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                // Chuyển đổi sang Content URI bằng FileProvider
                                 val savedUri = FileProvider.getUriForFile(
                                     context,
                                     "${context.packageName}.fileprovider",
@@ -280,12 +351,25 @@ fun CameraScreen(
                     .height(56.dp)
                     .weight(1f)
                     .padding(horizontal = 16.dp),
-                enabled = !viewModel.isProcessing
+                enabled = !viewModel.isProcessing,
+                shape = RoundedCornerShape(28.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
             ) {
-                Text(if (viewModel.isProcessing) "Đang quét..." else "Chụp và Cắt")
+                Icon(
+                    imageVector = Icons.Default.CameraAlt,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (viewModel.isProcessing) "Đang quét..." else "Chụp và Cắt",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
             }
 
-            // Để cân bằng UI
             Spacer(modifier = Modifier.size(56.dp))
         }
     }
@@ -353,7 +437,7 @@ fun CameraPermissionRationaleScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Ứng dụng cần quyền Camera để chụp tài liệu, nhận diện ký tự (OCR) và hỗ trợ bạn dịch thuật tiếng Anh một cách nhanh chóng.",
+                text = "Ứng dụng cần quyền Camera để chụp tài liệu, nhận diện ký tự (OCR) và phục vụ học tập.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

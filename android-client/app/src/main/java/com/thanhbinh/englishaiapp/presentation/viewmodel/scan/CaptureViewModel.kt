@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.thanhbinh.englishaiapp.utils.OcrTextHelper
 
 class CaptureViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -20,26 +21,40 @@ class CaptureViewModel(application: Application) : AndroidViewModel(application)
     var isProcessing by mutableStateOf(false)
         private set
 
-    fun processImage(context: Context, uri: Uri, onSuccess: (String) -> Unit) {
+    fun processImage(
+        context: Context,
+        uri: Uri,
+        onSuccess: (String) -> Unit,
+        onError: ((String) -> Unit)? = null
+    ) {
         isProcessing = true
         try {
             val image = InputImage.fromFilePath(context, uri)
             recognizer.process(image)
                 .addOnSuccessListener { visionText ->
                     isProcessing = false
-                    if (visionText.text.isNotBlank()) {
-                        onSuccess(visionText.text)
+                    val formattedText = OcrTextHelper.formatOcrText(visionText)
+                    if (formattedText.isNotBlank()) {
+                        onSuccess(formattedText)
                     } else {
                         Log.d("OCR", "Không tìm thấy văn bản")
+                        onError?.invoke("Không tìm thấy văn bản trong hình ảnh. Vui lòng thử lại với ảnh rõ hơn.")
                     }
                 }
                 .addOnFailureListener { e ->
                     isProcessing = false
                     Log.e("OCR", "Lỗi quét chữ: ${e.message}")
+                    onError?.invoke("Lỗi quét chữ: ${e.message}")
                 }
         } catch (e: Exception) {
             isProcessing = false
             Log.e("OCR", "Lỗi đọc file: ${e.message}")
+            onError?.invoke("Lỗi đọc tệp ảnh: ${e.message}")
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        recognizer.close()
     }
 }

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -64,7 +64,7 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
             )
         }
 
-        // --- 4. MÀN HÌNH CAMERA (QUÉT OCR) ---
+        // --- 4. MÀN HÌNH CAMERA QUÉT TÀI LIỆU (OCR) ---
         composable(Screen.Camera.route) {
             CameraScreen(
                 onTextScanned = { resultText ->
@@ -125,12 +125,11 @@ fun TranslateScreen() {
             val activity = view.context as? AppCompatActivity
             val fm = activity?.supportFragmentManager ?: return@AndroidView
             val existing = fm.findFragmentById(view.id)
-            if (existing != null) {
-                fm.beginTransaction().remove(existing).commitNowAllowingStateLoss()
+            if (existing == null) {
+                fm.beginTransaction()
+                    .replace(view.id, TranslateFragment.newInstance(), "TranslateFragment")
+                    .commitAllowingStateLoss()
             }
-            fm.beginTransaction()
-                .replace(view.id, TranslateFragment(), "TranslateFragment")
-                .commitAllowingStateLoss()
         }
     )
 }

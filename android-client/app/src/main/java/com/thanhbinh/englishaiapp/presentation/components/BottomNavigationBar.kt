@@ -14,8 +14,9 @@ fun BottomNavigationBar(navController: NavController) {
         val currentRoute = navBackStackEntry?.destination?.route
 
         bottomNavItems.forEach { screen ->
+            val isSelected = currentRoute?.substringBefore("?") == screen.route.substringBefore("?")
             NavigationBarItem(
-                selected = currentRoute == screen.route,
+                selected = isSelected,
                 onClick = {
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.startDestinationId) {

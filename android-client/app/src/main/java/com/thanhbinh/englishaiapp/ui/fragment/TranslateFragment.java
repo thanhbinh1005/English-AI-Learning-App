@@ -22,13 +22,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.thanhbinh.englishaiapp.R;
-import com.thanhbinh.englishaiapp.data.local.AppDatabase;
-import com.thanhbinh.englishaiapp.data.local.entity.HistoryItem;
-import com.thanhbinh.englishaiapp.databinding.FragmentTranslateBinding;
-import com.thanhbinh.englishaiapp.ui.adapter.HistoryAdapter;
-import com.thanhbinh.englishaiapp.ui.adapter.LanguageSelectionAdapter;
-import com.thanhbinh.englishaiapp.utils.TranslationHelper;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
@@ -39,6 +32,13 @@ import com.google.mlkit.nl.translate.TranslateLanguage;
 import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
+import com.thanhbinh.englishaiapp.R;
+import com.thanhbinh.englishaiapp.data.local.AppDatabase;
+import com.thanhbinh.englishaiapp.data.local.entity.HistoryItem;
+import com.thanhbinh.englishaiapp.databinding.FragmentTranslateBinding;
+import com.thanhbinh.englishaiapp.ui.adapter.HistoryAdapter;
+import com.thanhbinh.englishaiapp.ui.adapter.LanguageSelectionAdapter;
+import com.thanhbinh.englishaiapp.utils.TranslationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +61,20 @@ public class TranslateFragment extends Fragment {
 
     private TextToSpeech tts;
     private LanguageIdentifier languageIdentifier;
+
+    public static TranslateFragment newInstance() {
+        return new TranslateFragment();
+    }
+
+    public void setInputTextAndTranslate(String text) {
+        if (text != null && !text.trim().isEmpty()) {
+            if (binding != null) {
+                binding.etInput.setText(text.trim());
+                binding.etInput.setSelection(binding.etInput.getText().length());
+                translateText();
+            }
+        }
+    }
 
     @Nullable
     @Override
@@ -207,7 +221,7 @@ public class TranslateFragment extends Fragment {
 
         binding.btnCopy.setOnClickListener(v -> {
             String result = binding.tvResult.getText().toString();
-            if (!result.isEmpty() && !result.equals("Translation will appear here...")) {
+            if (!result.isEmpty() && !result.equals("Translation will appear here...") && !result.equals("Bản dịch sẽ xuất hiện tại đây...")) {
                 ClipboardManager clipboard = (ClipboardManager) requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Translated Text", result);
                 if (clipboard != null) {
