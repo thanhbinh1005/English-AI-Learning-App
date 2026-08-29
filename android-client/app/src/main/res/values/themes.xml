@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.EnglishAIApp" parent="Theme.Material3.DayNight.NoActionBar" />
+    <style name="Theme.EnglishAIApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/app_bg</item>
+        <item name="colorSurface">@color/app_surface</item>
+        <item name="colorSurfaceVariant">@color/app_surface_variant</item>
+        <item name="colorOnSurface">@color/app_text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/app_text_secondary</item>
+        <item name="colorPrimary">@color/app_accent</item>
+    </style>
 
     <!-- Style dành riêng cho Thư viện Cắt ảnh (Bắt buộc dùng AppCompat) -->
     <style name="Theme.App.Cropper" parent="Theme.AppCompat.Light.DarkActionBar" />

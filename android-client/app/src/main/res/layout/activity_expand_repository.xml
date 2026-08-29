@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
+    android:background="@color/app_bg">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                     android:contentDescription="Back"
                     android:padding="8dp"
                     android:src="@drawable/ic_arrow_back"
-                    app:tint="#0F172A" />
+                    app:tint="@color/app_text_primary" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -49,7 +49,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Mở rộng kho từ vựng"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/app_text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
@@ -57,7 +57,7 @@
                         android:id="@+id/txtTargetCollection"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="#64748B"
+                        android:textColor="@color/app_text_secondary"
                         android:textSize="12sp"
                         android:textStyle="bold"
                         tools:text="TARGET: IT TERMS" />
@@ -71,11 +71,11 @@
                     android:paddingHorizontal="12dp"
                     android:text="Thao tác hàng loạt"
                     android:textAllCaps="false"
-                    android:textColor="#0F172A"
+                    android:textColor="@color/app_text_primary"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:cornerRadius="8dp"
-                    app:strokeColor="#CBD5E1"
+                    app:strokeColor="@color/app_border"
                     app:strokeWidth="1.5dp" />
             </LinearLayout>
 
@@ -83,7 +83,7 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#E2E8F0" />
+                android:background="@color/app_border" />
 
             <!-- SECTION 1: MANUAL INPUT -->
             <LinearLayout
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nhập thủ công"
-                    android:textColor="#0F172A"
+                    android:textColor="@color/app_text_primary"
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Thêm từng từ vựng một cách chính xác."
-                    android:textColor="#64748B"
+                    android:textColor="@color/app_text_secondary"
                     android:textSize="13sp" />
 
                 <!-- Manual Input Card -->
@@ -114,10 +114,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardBackgroundColor="@color/app_surface"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="1.5dp"
-                    app:strokeColor="#CBD5E1"
+                    app:strokeColor="@color/app_border"
                     app:strokeWidth="1.5dp">
 
                     <LinearLayout
@@ -131,7 +131,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="# TỪ VỰNG"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/app_text_secondary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -145,8 +145,8 @@
                             android:importantForAutofill="no"
                             android:inputType="textCapWords"
                             android:paddingHorizontal="14dp"
-                            android:textColor="#0F172A"
-                            android:textColorHint="#94A3B8"
+                            android:textColor="@color/app_text_primary"
+                            android:textColorHint="@color/app_input_hint"
                             android:textSize="14sp" />
 
                         <!-- Field 2: Contextual Meaning -->
@@ -155,7 +155,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="14dp"
                             android:text="▪ NGHĨA CỦA TỪ"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/app_text_secondary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -169,8 +169,8 @@
                             android:importantForAutofill="no"
                             android:inputType="text"
                             android:paddingHorizontal="14dp"
-                            android:textColor="#0F172A"
-                            android:textColorHint="#94A3B8"
+                            android:textColor="@color/app_text_primary"
+                            android:textColorHint="@color/app_input_hint"
                             android:textSize="14sp" />
 
                         <!-- Field 3: Usage Scenario -->
@@ -179,7 +179,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="14dp"
                             android:text="* VÍ DỤ MINH HỌA"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/app_text_secondary"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -194,8 +194,8 @@
                             android:importantForAutofill="no"
                             android:inputType="textMultiLine"
                             android:padding="12dp"
-                            android:textColor="#0F172A"
-                            android:textColorHint="#94A3B8"
+                            android:textColor="@color/app_text_primary"
+                            android:textColorHint="@color/app_input_hint"
                             android:textSize="14sp" />
 
                         <!-- Append to List Button -->
@@ -207,11 +207,11 @@
                             android:layout_marginTop="16dp"
                             android:text="Thêm vào danh sách"
                             android:textAllCaps="false"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/app_text_primary"
                             android:textSize="14sp"
                             android:textStyle="bold"
                             app:cornerRadius="8dp"
-                            app:strokeColor="#0F172A"
+                            app:strokeColor="@color/app_border"
                             app:strokeWidth="1.5dp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -236,14 +236,14 @@
                         android:layout_height="18dp"
                         android:contentDescription="Icon"
                         android:src="@drawable/ic_excel_csv"
-                        app:tint="#0F172A" />
+                        app:tint="@color/app_text_primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="Nhập từ bên ngoài"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/app_text_primary"
                         android:textSize="17sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -267,14 +267,14 @@
                         android:layout_height="36dp"
                         android:contentDescription="Upload Icon"
                         android:src="@drawable/ic_upload_cloud"
-                        app:tint="#0D6EFD" />
+                        app:tint="@color/app_accent" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:text="Tải tệp Excel/CSV"
-                        android:textColor="#0F172A"
+                        android:textColor="@color/app_text_primary"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -284,7 +284,7 @@
                         android:layout_marginTop="4dp"
                         android:gravity="center"
                         android:text="Nhấn để chọn file .xlsx hoặc .csv (3 cột: Từ, Nghĩa, Ví dụ)"
-                        android:textColor="#64748B"
+                        android:textColor="@color/app_text_secondary"
                         android:textSize="12sp" />
                 </LinearLayout>
             </LinearLayout>
@@ -314,7 +314,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Hàng chờ"
-                            android:textColor="#0F172A"
+                            android:textColor="@color/app_text_primary"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -324,7 +324,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:text="Các từ vựng đang chờ lưu trữ."
-                            android:textColor="#64748B"
+                            android:textColor="@color/app_text_secondary"
                             android:textSize="13sp" />
                     </LinearLayout>
 
@@ -332,7 +332,7 @@
                         android:id="@+id/btnCommitAll"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
-                        app:backgroundTint="#0D6EFD"
+                        app:backgroundTint="@color/app_accent"
                         android:paddingHorizontal="16dp"
                         android:text="Lưu tất cả"
                         android:textAllCaps="false"
@@ -359,7 +359,7 @@
                         android:layout_height="48dp"
                         android:contentDescription="Empty"
                         android:src="@drawable/ic_cards"
-                        app:tint="#CBD5E1" />
+                        app:tint="@color/app_input_hint" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -367,7 +367,7 @@
                         android:layout_marginTop="10dp"
                         android:gravity="center"
                         android:text="Chưa có từ vựng nào trong danh sách chờ.\nHãy nhập từ thủ công ở trên hoặc tải file Excel/CSV."
-                        android:textColor="#94A3B8"
+                        android:textColor="@color/app_input_hint"
                         android:textSize="13sp" />
                 </LinearLayout>
 

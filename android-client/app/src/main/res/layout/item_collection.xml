@@ -9,7 +9,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    app:cardBackgroundColor="#FFFFFF"
+    app:cardBackgroundColor="@color/app_surface"
     app:cardCornerRadius="24dp"
     app:cardElevation="2dp">
 
@@ -49,7 +49,7 @@
                         android:layout_gravity="center"
                         android:contentDescription="Folder Icon"
                         android:src="@drawable/ic_folder_add"
-                        app:tint="#0D6EFD" />
+                        app:tint="@color/app_accent" />
                 </FrameLayout>
 
                 <View
@@ -75,7 +75,7 @@
                 android:layout_marginTop="10dp"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="#0F172A"
+                android:textColor="@color/app_text_primary"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 tools:text="Business English 2024" />
@@ -88,7 +88,7 @@
                 android:layout_weight="1"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:textColor="#64748B"
+                android:textColor="@color/app_text_secondary"
                 android:textSize="12sp"
                 tools:text="Learn business vocabulary for work." />
 
@@ -125,10 +125,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:background="#F1F5F9"
+                android:background="@drawable/bg_badge"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="3dp"
-                android:textColor="#0D6EFD"
+                android:textColor="@color/app_text_accent"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 tools:text="0 từ vựng" />

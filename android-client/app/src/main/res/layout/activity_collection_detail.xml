@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC"
+    android:background="@color/app_bg"
     tools:context=".CollectionDetailActivity">
 
     <!-- Top Bar -->
@@ -27,7 +27,7 @@
             android:contentDescription="Back"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
-            app:tint="#0F172A" />
+            app:tint="@color/app_text_primary" />
 
         <TextView
             android:id="@+id/txtCollectionTitle"
@@ -37,7 +37,7 @@
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="#0F172A"
+            android:textColor="@color/app_text_primary"
             android:textSize="19sp"
             android:textStyle="bold"
             tools:text="Business English 2024" />
@@ -62,7 +62,7 @@
         android:id="@+id/accentLine"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:background="#0D6EFD"
+        android:background="@color/app_accent"
         app:layout_constraintTop_toBottomOf="@id/topBar" />
 
     <FrameLayout
@@ -86,7 +86,7 @@
                 android:layout_height="20dp"
                 android:contentDescription="Search"
                 android:src="@drawable/ic_search"
-                app:tint="#64748B" />
+                app:tint="@color/app_text_secondary" />
 
             <EditText
                 android:id="@+id/edtSearch"
@@ -96,8 +96,8 @@
                 android:background="@null"
                 android:hint="Tìm kiếm từ vựng..."
                 android:inputType="text"
-                android:textColor="#0F172A"
-                android:textColorHint="#94A3B8"
+                android:textColor="@color/app_text_primary"
+                android:textColorHint="@color/app_input_hint"
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -132,14 +132,14 @@
             android:layout_height="64dp"
             android:contentDescription="Empty"
             android:src="@drawable/ic_folder_add"
-            app:tint="#94A3B8" />
+            app:tint="@color/app_input_hint" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Chưa có từ vựng nào trong bộ này"
-            android:textColor="#64748B"
+            android:textColor="@color/app_text_secondary"
             android:textSize="16sp" />
 
         <TextView
@@ -147,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:text="Nhấn nút + bên dưới để thêm từ vựng mới"
-            android:textColor="#94A3B8"
+            android:textColor="@color/app_input_hint"
             android:textSize="14sp" />
     </LinearLayout>
 
@@ -158,7 +158,7 @@
         android:layout_margin="24dp"
         android:contentDescription="Add Word"
         android:src="@drawable/ic_add"
-        app:backgroundTint="#0D6EFD"
+        app:backgroundTint="@color/app_accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="#FFFFFF" />

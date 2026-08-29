@@ -1,52 +1,60 @@
 package com.thanhbinh.englishaiapp.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
-// --- Colors ---
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// --- Unified Brand Colors (Matches XML Semantic Palette) ---
+val AppLightBackground = Color(0xFFF4F7FB)
+val AppLightSurface = Color(0xFFFFFFFF)
+val AppLightSurfaceVariant = Color(0xFFF1F5F9)
+val AppLightPrimary = Color(0xFF0D6EFD)
+val AppLightOnBackground = Color(0xFF0F172A)
+val AppLightOnSurface = Color(0xFF0F172A)
+val AppLightOnSurfaceVariant = Color(0xFF64748B)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val AppDarkBackground = Color(0xFF121824)
+val AppDarkSurface = Color(0xFF1E293B)
+val AppDarkSurfaceVariant = Color(0xFF2A374A)
+val AppDarkPrimary = Color(0xFF3B82F6)
+val AppDarkOnBackground = Color(0xFFF8FAFC)
+val AppDarkOnSurface = Color(0xFFF8FAFC)
+val AppDarkOnSurfaceVariant = Color(0xFF94A3B8)
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = AppDarkPrimary,
+    secondary = Color(0xFF60A5FA),
+    tertiary = Color(0xFF34D399),
+    background = AppDarkBackground,
+    surface = AppDarkSurface,
+    surfaceVariant = AppDarkSurfaceVariant,
+    onBackground = AppDarkOnBackground,
+    onSurface = AppDarkOnSurface,
+    onSurfaceVariant = AppDarkOnSurfaceVariant
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = AppLightPrimary,
+    secondary = Color(0xFF2563EB),
+    tertiary = Color(0xFF10B981),
+    background = AppLightBackground,
+    surface = AppLightSurface,
+    surfaceVariant = AppLightSurfaceVariant,
+    onBackground = AppLightOnBackground,
+    onSurface = AppLightOnSurface,
+    onSurfaceVariant = AppLightOnSurfaceVariant
 )
 
 @Composable
 fun EnglishAIAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

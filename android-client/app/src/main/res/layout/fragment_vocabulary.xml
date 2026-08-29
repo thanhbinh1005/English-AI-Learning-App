@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8FAFC">
+    android:background="@color/app_bg">
 
     <!-- Top App Header -->
     <TextView
@@ -14,7 +14,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="20dp"
         android:text="Thư viện từ vựng"
-        android:textColor="#0D6EFD"
+        android:textColor="@color/app_text_accent"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -142,7 +142,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="20dp"
         android:text="Bộ sưu tập"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
         android:textSize="22sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -155,7 +155,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="2dp"
         android:text="Phát triển vốn từ của bạn"
-        android:textColor="#64748B"
+        android:textColor="@color/app_text_secondary"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtSectionTitle" />
@@ -167,7 +167,7 @@
         android:layout_marginEnd="24dp"
         android:contentDescription="Create Collection"
         android:src="@drawable/ic_add"
-        app:backgroundTint="#0D6EFD"
+        app:backgroundTint="@color/app_accent"
         app:elevation="4dp"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="@id/txtSectionSubtitle"
