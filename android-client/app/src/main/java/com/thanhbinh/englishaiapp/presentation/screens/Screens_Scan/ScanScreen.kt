@@ -40,6 +40,19 @@ fun ScanScreen(
     onNavigateToCamera: () -> Unit
 ) {
     val scannedDocs by viewModel.allDocs.collectAsState(initial = emptyList())
+    var searchQuery by remember { mutableStateOf("") }
+
+    val filteredDocs = remember(scannedDocs, searchQuery) {
+        if (searchQuery.isBlank()) {
+            scannedDocs
+        } else {
+            val query = searchQuery.trim().lowercase(Locale.getDefault())
+            scannedDocs.filter {
+                it.fileName.lowercase(Locale.getDefault()).contains(query) ||
+                it.content.lowercase(Locale.getDefault()).contains(query)
+            }
+        }
+    }
 
     var showDeleteDialog by remember { mutableStateOf(false) }
     var docToDelete by remember { mutableStateOf<ScannedDocEntity?>(null) }
@@ -81,14 +94,50 @@ fun ScanScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // 1. Banner Header: Quét tài liệu
         item {
             HeaderBanner(onScanClick = onNavigateToCamera)
         }
 
-        // 2. Tiêu đề danh sách
+        // 2. Thanh tìm kiếm tài liệu (Search bar)
+        item {
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Tìm kiếm tài liệu theo tên hoặc nội dung...") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Clear",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // 3. Tiêu đề danh sách
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -96,15 +145,19 @@ fun ScanScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Bản quét của tôi (${scannedDocs.size})",
-                    style = MaterialTheme.typography.titleLarge,
+                    text = if (searchQuery.isBlank()) {
+                        "Bản quét của tôi (${scannedDocs.size})"
+                    } else {
+                        "Kết quả tìm kiếm (${filteredDocs.size})"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
 
-        // 3. Danh sách các file đã quét
+        // 4. Danh sách các file đã lọc
         if (scannedDocs.isEmpty()) {
             item {
                 Card(
@@ -160,8 +213,48 @@ fun ScanScreen(
                     }
                 }
             }
+        } else if (filteredDocs.isEmpty()) {
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Không tìm thấy tài liệu phù hợp",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Không có tài liệu nào chứa từ khóa \"$searchQuery\"",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        TextButton(onClick = { searchQuery = "" }) {
+                            Text("Xóa từ khóa tìm kiếm")
+                        }
+                    }
+                }
+            }
         } else {
-            items(scannedDocs) { doc ->
+            items(filteredDocs, key = { it.id }) { doc ->
                 ScannedFileItem(
                     doc = doc,
                     onDelete = {
