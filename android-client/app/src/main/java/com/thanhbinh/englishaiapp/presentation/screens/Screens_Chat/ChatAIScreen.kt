@@ -372,7 +372,8 @@ fun ChatAIScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                windowInsets = WindowInsets(0, 0, 0, 0)
             )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
