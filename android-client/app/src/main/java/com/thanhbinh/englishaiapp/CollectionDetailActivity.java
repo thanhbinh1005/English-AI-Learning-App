@@ -61,6 +61,9 @@ public class CollectionDetailActivity extends AppCompatActivity implements Vocab
 
         initTTS();
         initViews();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            AppDatabase.getInstance(getApplicationContext()).vocabularyDao().removeDuplicates();
+        });
         observeData("");
     }
 

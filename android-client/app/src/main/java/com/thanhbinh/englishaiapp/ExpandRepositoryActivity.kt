@@ -127,6 +127,21 @@ class ExpandRepositoryActivity : AppCompatActivity() {
             return
         }
 
+        // Kiểm tra xem từ đã có trong danh sách chờ (Staging) chưa
+        val currentStaging = stagingAdapter.getItems()
+        val existingStagingIndex = currentStaging.indexOfFirst { it.term.equals(term, ignoreCase = true) }
+        if (existingStagingIndex != -1) {
+            val updated = StagingVocabulary(term = term, meaning = meaning, example = example)
+            stagingAdapter.updateItem(existingStagingIndex, updated)
+            binding.edtTerm.text?.clear()
+            binding.edtMeaning.text?.clear()
+            binding.edtExample.text?.clear()
+            binding.edtTerm.requestFocus()
+            updateStagingUI()
+            Toast.makeText(this, "Từ \"$term\" đã có trong danh sách chờ - Đã cập nhật lại nội dung!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val item = StagingVocabulary(term = term, meaning = meaning, example = example)
         stagingAdapter.addItem(item)
 
@@ -148,13 +163,38 @@ class ExpandRepositoryActivity : AppCompatActivity() {
                 }
 
                 if (importedList.isNotEmpty()) {
-                    stagingAdapter.addAll(importedList)
-                    updateStagingUI()
-                    Toast.makeText(
-                        this@ExpandRepositoryActivity,
-                        "Đã nhập thành công ${importedList.size} từ vựng vào hàng chờ!",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    // Lọc trùng lặp bên trong file nhập vào
+                    val distinctImported = mutableListOf<StagingVocabulary>()
+                    val seenTerms = mutableSetOf<String>()
+                    for (item in importedList) {
+                        val key = item.term.trim().lowercase(java.util.Locale.getDefault())
+                        if (!seenTerms.contains(key)) {
+                            seenTerms.add(key)
+                            distinctImported.add(item)
+                        }
+                    }
+
+                    // Lọc các từ đã có trong hàng chờ hiện tại
+                    val currentTerms = stagingAdapter.getItems().map { it.term.trim().lowercase(java.util.Locale.getDefault()) }.toSet()
+                    val newItems = distinctImported.filter { !currentTerms.contains(it.term.trim().lowercase(java.util.Locale.getDefault())) }
+
+                    if (newItems.isNotEmpty()) {
+                        stagingAdapter.addAll(newItems)
+                        updateStagingUI()
+                        val skipped = importedList.size - newItems.size
+                        val msg = if (skipped > 0) {
+                            "Đã nhập ${newItems.size} từ vựng vào hàng chờ (đã bỏ qua $skipped từ trùng lặp)!"
+                        } else {
+                            "Đã nhập thành công ${newItems.size} từ vựng vào hàng chờ!"
+                        }
+                        Toast.makeText(this@ExpandRepositoryActivity, msg, Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(
+                            this@ExpandRepositoryActivity,
+                            "Tất cả từ vựng trong file đã có sẵn trong danh sách chờ!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 } else {
                     Toast.makeText(
                         this@ExpandRepositoryActivity,
@@ -230,29 +270,47 @@ class ExpandRepositoryActivity : AppCompatActivity() {
         }
 
         val currentTime = System.currentTimeMillis()
-        val entities = items.map { item ->
-            VocabularyEntity(
-                collectionId,
-                item.term,
-                item.meaning,
-                item.example,
-                false,
-                currentTime
-            )
-        }
 
         lifecycleScope.launch {
+            var insertedCount = 0
+            var updatedCount = 0
+
             withContext(Dispatchers.IO) {
-                AppDatabase.getInstance(applicationContext)
-                    .vocabularyDao()
-                    .insertAll(entities)
+                val db = AppDatabase.getInstance(applicationContext)
+                val vocabDao = db.vocabularyDao()
+
+                for (item in items) {
+                    val existing = vocabDao.getVocabularyByTerm(collectionId, item.term.trim())
+                    if (existing != null) {
+                        existing.meaning = item.meaning.trim()
+                        if (item.example.isNotBlank()) {
+                            existing.example = item.example.trim()
+                        }
+                        vocabDao.update(existing)
+                        updatedCount++
+                    } else {
+                        val newEntity = VocabularyEntity(
+                            collectionId,
+                            item.term.trim(),
+                            item.meaning.trim(),
+                            item.example.trim(),
+                            false,
+                            currentTime
+                        )
+                        vocabDao.insert(newEntity)
+                        insertedCount++
+                    }
+                }
+                vocabDao.removeDuplicates()
             }
 
-            Toast.makeText(
-                this@ExpandRepositoryActivity,
-                "Đã lưu thành công ${entities.size} từ vựng vào \"$collectionName\"!",
-                Toast.LENGTH_LONG
-            ).show()
+            val summaryMsg = if (updatedCount > 0) {
+                "Đã lưu $insertedCount từ mới và cập nhật $updatedCount từ có sẵn vào \"$collectionName\"!"
+            } else {
+                "Đã lưu thành công $insertedCount từ vựng vào \"$collectionName\"!"
+            }
+
+            Toast.makeText(this@ExpandRepositoryActivity, summaryMsg, Toast.LENGTH_LONG).show()
 
             setResult(RESULT_OK)
             finish()

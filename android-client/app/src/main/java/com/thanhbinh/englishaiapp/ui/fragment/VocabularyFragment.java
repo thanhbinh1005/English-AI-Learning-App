@@ -40,6 +40,11 @@ public class VocabularyFragment extends Fragment implements CollectionAdapter.On
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            if (getContext() != null) {
+                AppDatabase.getInstance(requireContext().getApplicationContext()).vocabularyDao().removeDuplicates();
+            }
+        });
         observeData();
     }
 

@@ -45,4 +45,13 @@ public interface VocabularyDao {
 
     @Query("UPDATE vocabularies SET isLearned = :isLearned WHERE id = :id")
     void updateLearnedStatus(long id, boolean isLearned);
+
+    @Query("SELECT LOWER(TRIM(term)) FROM vocabularies WHERE collectionId = :collectionId")
+    List<String> getExistingTerms(long collectionId);
+
+    @Query("SELECT * FROM vocabularies WHERE collectionId = :collectionId AND LOWER(TRIM(term)) = LOWER(TRIM(:term)) LIMIT 1")
+    VocabularyEntity getVocabularyByTerm(long collectionId, String term);
+
+    @Query("DELETE FROM vocabularies WHERE id NOT IN (SELECT MAX(id) FROM vocabularies GROUP BY collectionId, LOWER(TRIM(term)))")
+    void removeDuplicates();
 }
