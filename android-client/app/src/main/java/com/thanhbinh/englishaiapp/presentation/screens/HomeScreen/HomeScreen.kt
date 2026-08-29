@@ -31,6 +31,12 @@ fun HomeScreen(
     onNavigateToVocabulary: () -> Unit,
     onNavigateToChatAi: () -> Unit
 ) {
+    val isDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val vocabCardBg = if (isDark) Color(0xFF3B1E48) else Color(0xFFF3E5F5)
+    val vocabCardText = if (isDark) Color(0xFFCE93D8) else Color(0xFF9C27B0)
+    val chatCardBg = if (isDark) Color(0xFF003830) else Color(0xFFE0F2F1)
+    val chatCardText = if (isDark) Color(0xFF80CBC4) else Color(0xFF00796B)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,8 +91,8 @@ fun HomeScreen(
                     title = "Học từ vựng",
                     description = "Ôn tập flashcard và thư mục từ",
                     icon = Icons.Default.School,
-                    containerColor = Color(0xFFF3E5F5),
-                    contentColor = Color(0xFF9C27B0),
+                    containerColor = vocabCardBg,
+                    contentColor = vocabCardText,
                     onClick = onNavigateToVocabulary
                 )
             }
@@ -96,8 +102,8 @@ fun HomeScreen(
                     title = "Trợ lý Chat AI",
                     description = "Hỏi đáp, luyện hội thoại thông minh",
                     icon = Icons.Default.AutoAwesome,
-                    containerColor = Color(0xFFE0F2F1),
-                    contentColor = Color(0xFF00796B),
+                    containerColor = chatCardBg,
+                    contentColor = chatCardText,
                     onClick = onNavigateToChatAi
                 )
             }

@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.ViewCompat
@@ -219,7 +219,7 @@ class ExpandRepositoryActivity : AppCompatActivity() {
         dialogBinding.edtEditMeaning.setText(item.meaning)
         dialogBinding.edtEditExample.setText(item.example)
 
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setView(dialogBinding.root)
             .setPositiveButton("Lưu") { _, _ ->
                 val newTerm = dialogBinding.edtEditTerm.text.toString().trim()
@@ -326,7 +326,7 @@ class ExpandRepositoryActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 1 -> {
                     if (stagingAdapter.itemCount > 0) {
-                        AlertDialog.Builder(this)
+                        MaterialAlertDialogBuilder(this)
                             .setTitle("Xóa danh sách chờ")
                             .setMessage("Bạn có chắc muốn xóa tất cả ${stagingAdapter.itemCount} từ vựng đang chờ lưu?")
                             .setPositiveButton("Xóa") { _, _ ->
@@ -352,7 +352,7 @@ class ExpandRepositoryActivity : AppCompatActivity() {
     }
 
     private fun showSampleFormatDialog() {
-        AlertDialog.Builder(this)
+        MaterialAlertDialogBuilder(this)
             .setTitle("Định dạng file Excel / CSV")
             .setMessage(
                 "File cần có 3 cột theo thứ tự:\n\n" +

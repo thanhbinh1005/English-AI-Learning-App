@@ -1,6 +1,7 @@
 package com.thanhbinh.englishaiapp
 
 import com.thanhbinh.englishaiapp.data.local.entity.ChatMessageEntity
+import com.thanhbinh.englishaiapp.data.local.entity.ChatSessionEntity
 import com.thanhbinh.englishaiapp.data.model.ChatMessage
 import com.thanhbinh.englishaiapp.utils.AppConfig
 import org.junit.Assert.*
@@ -53,8 +54,9 @@ class ChatMessageTest {
             isError = false
         )
 
-        val entity = ChatMessageEntity.fromChatMessage(original)
+        val entity = ChatMessageEntity.fromChatMessage(original, "session-abc")
         assertEquals(original.id, entity.id)
+        assertEquals("session-abc", entity.sessionId)
         assertEquals(original.text, entity.text)
         assertEquals(original.isUser, entity.isUser)
         assertEquals(original.timestamp, entity.timestamp)
@@ -62,6 +64,21 @@ class ChatMessageTest {
 
         val converted = entity.toChatMessage()
         assertEquals(original, converted)
+    }
+
+    @Test
+    fun testChatSessionEntity_creation() {
+        val session = ChatSessionEntity(
+            id = "session-1",
+            title = "Học ngữ pháp tiếng Anh",
+            createdAt = 1700000000000L,
+            updatedAt = 1700000005000L,
+            messageCount = 4
+        )
+        assertEquals("session-1", session.id)
+        assertEquals("Học ngữ pháp tiếng Anh", session.title)
+        assertEquals(4, session.messageCount)
+        assertTrue(session.updatedAt >= session.createdAt)
     }
 
     @Test

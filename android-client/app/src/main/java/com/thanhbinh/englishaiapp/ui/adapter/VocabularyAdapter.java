@@ -19,6 +19,7 @@ public class VocabularyAdapter extends RecyclerView.Adapter<VocabularyAdapter.Vo
     private final OnVocabularyClickListener listener;
 
     public interface OnVocabularyClickListener {
+        void onItemClick(VocabularyEntity vocabulary, int position);
         void onDeleteClick(VocabularyEntity vocabulary);
         void onSpeechClick(VocabularyEntity vocabulary);
         void onLearnedToggle(VocabularyEntity vocabulary, boolean isLearned);
@@ -76,6 +77,13 @@ public class VocabularyAdapter extends RecyclerView.Adapter<VocabularyAdapter.Vo
             } else {
                 binding.txtExample.setVisibility(View.GONE);
             }
+
+            binding.getRoot().setOnClickListener(v -> {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onItemClick(item, pos);
+                }
+            });
 
             binding.btnSpeech.setOnClickListener(v -> {
                 if (listener != null) listener.onSpeechClick(item);

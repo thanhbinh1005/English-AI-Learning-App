@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -140,6 +138,14 @@ public class CollectionDetailActivity extends AppCompatActivity implements Vocab
             binding.layoutEmpty.setVisibility(View.GONE);
             binding.rvVocabularies.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onItemClick(VocabularyEntity vocabulary, int position) {
+        Intent intent = new Intent(this, FlashcardActivity.class);
+        intent.putExtra("collection_id", collectionId);
+        intent.putExtra("collection_name", collectionName);
+        startActivity(intent);
     }
 
     @Override

@@ -5,7 +5,7 @@
     android:id="@+id/mainFlashcard"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="@color/app_bg"
     tools:context=".FlashcardActivity">
 
     <ImageView
@@ -20,7 +20,7 @@
         android:src="@drawable/ic_arrow_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="#0F172A" />
+        app:tint="@color/app_text_primary" />
 
     <TextView
         android:id="@+id/txtFlashcardTitle"
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:text="Học Flashcard"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
@@ -40,10 +40,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        android:background="#E2E8F0"
+        android:background="@drawable/bg_badge"
         android:paddingHorizontal="12dp"
         android:paddingVertical="4dp"
-        android:textColor="#334155"
+        android:textColor="@color/app_text_accent"
         android:textSize="13sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/btnBack"
@@ -80,7 +80,7 @@
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
-            app:cardBackgroundColor="#FFFFFF"
+            app:cardBackgroundColor="@color/app_surface"
             app:cardCornerRadius="24dp"
             app:cardElevation="4dp">
 
@@ -94,11 +94,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#E8F1FF"
+                    android:background="@drawable/bg_badge"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="4dp"
                     android:text="TIẾNG ANH"
-                    android:textColor="#0D6EFD"
+                    android:textColor="@color/app_text_accent"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -108,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
                     android:gravity="center"
-                    android:textColor="#0F172A"
+                    android:textColor="@color/app_text_primary"
                     android:textSize="32sp"
                     android:textStyle="bold"
                     tools:text="Entrepreneur" />
@@ -122,14 +122,14 @@
                     android:contentDescription="Speak"
                     android:padding="10dp"
                     android:src="@drawable/ic_volume"
-                    app:tint="#0D6EFD" />
+                    app:tint="@color/app_accent" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="36dp"
                     android:text="Chạm để lật thẻ xem nghĩa 👆"
-                    android:textColor="#94A3B8"
+                    android:textColor="@color/app_text_secondary"
                     android:textSize="13sp" />
 
             </LinearLayout>
@@ -144,7 +144,7 @@
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
             android:visibility="gone"
-            app:cardBackgroundColor="#F8FAFC"
+            app:cardBackgroundColor="@color/app_surface"
             app:cardCornerRadius="24dp"
             app:cardElevation="4dp">
 
@@ -158,11 +158,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#ECFDF5"
+                    android:background="@drawable/bg_badge_success"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="4dp"
                     android:text="NGHĨA TIẾNG VIỆT"
-                    android:textColor="#10B981"
+                    android:textColor="@color/app_success"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
@@ -172,7 +172,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:gravity="center"
-                    android:textColor="#0D6EFD"
+                    android:textColor="@color/app_text_accent"
                     android:textSize="24sp"
                     android:textStyle="bold"
                     tools:text="Doanh nhân, người khởi nghiệp" />
@@ -183,7 +183,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
-                    android:textColor="#64748B"
+                    android:textColor="@color/app_text_secondary"
                     android:textSize="14sp"
                     android:textStyle="italic"
                     tools:text="She is a successful tech entrepreneur." />
@@ -197,14 +197,14 @@
                     android:contentDescription="Speak"
                     android:padding="10dp"
                     android:src="@drawable/ic_volume"
-                    app:tint="#0D6EFD" />
+                    app:tint="@color/app_accent" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:text="Chạm để xem lại từ 🔄"
-                    android:textColor="#94A3B8"
+                    android:textColor="@color/app_text_secondary"
                     android:textSize="13sp" />
 
             </LinearLayout>
@@ -237,8 +237,7 @@
             <FrameLayout
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/bg_color_selected_ring"
-                android:backgroundTint="#EF4444">
+                android:background="@drawable/bg_flashcard_action_unlearned">
 
                 <ImageView
                     android:layout_width="28dp"
@@ -246,7 +245,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="Wrong"
                     android:src="@drawable/ic_close"
-                    app:tint="#EF4444" />
+                    app:tint="@color/app_error" />
             </FrameLayout>
 
             <TextView
@@ -254,7 +253,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="Cần học lại"
-                android:textColor="#EF4444"
+                android:textColor="@color/app_error"
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -276,8 +275,7 @@
             <FrameLayout
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/bg_color_selected_ring"
-                android:backgroundTint="#10B981">
+                android:background="@drawable/bg_flashcard_action_learned">
 
                 <ImageView
                     android:layout_width="28dp"
@@ -285,7 +283,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="Check"
                     android:src="@drawable/ic_check_circle"
-                    app:tint="#10B981" />
+                    app:tint="@color/app_success" />
             </FrameLayout>
 
             <TextView
@@ -293,7 +291,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:text="Đã thuộc"
-                android:textColor="#10B981"
+                android:textColor="@color/app_success"
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>

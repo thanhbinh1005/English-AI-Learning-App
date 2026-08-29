@@ -12,6 +12,12 @@ interface ChatHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(messages: List<ChatMessageEntity>)
 
+    @Query("SELECT * FROM chat_history WHERE sessionId = :sessionId ORDER BY timestamp ASC")
+    fun getMessagesBySession(sessionId: String): Flow<List<ChatMessageEntity>>
+
+    @Query("SELECT * FROM chat_history WHERE sessionId = :sessionId ORDER BY timestamp ASC")
+    suspend fun getMessagesBySessionSync(sessionId: String): List<ChatMessageEntity>
+
     @Query("SELECT * FROM chat_history ORDER BY timestamp ASC")
     fun getAllMessages(): Flow<List<ChatMessageEntity>>
 
@@ -21,9 +27,12 @@ interface ChatHistoryDao {
     @Delete
     suspend fun deleteMessage(message: ChatMessageEntity)
 
+    @Query("DELETE FROM chat_history WHERE sessionId = :sessionId")
+    suspend fun deleteMessagesBySession(sessionId: String)
+
     @Query("DELETE FROM chat_history")
     suspend fun clearHistory()
 
-    @Query("SELECT COUNT(*) FROM chat_history")
-    suspend fun getMessageCount(): Int
+    @Query("SELECT COUNT(*) FROM chat_history WHERE sessionId = :sessionId")
+    suspend fun getMessageCountBySession(sessionId: String): Int
 }

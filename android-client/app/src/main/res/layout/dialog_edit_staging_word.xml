@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Chỉnh sửa từ vựng chờ"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="# TỪ VỰNG"
-        android:textColor="#475569"
+        android:textColor="@color/app_text_secondary"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -32,7 +32,8 @@
         android:importantForAutofill="no"
         android:inputType="textCapWords"
         android:paddingHorizontal="14dp"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
+        android:textColorHint="@color/app_input_hint"
         android:textSize="14sp" />
 
     <TextView
@@ -40,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:text="▪ ĐỊNH NGHĨA / NGHĨA"
-        android:textColor="#475569"
+        android:textColor="@color/app_text_secondary"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -54,7 +55,8 @@
         android:importantForAutofill="no"
         android:inputType="text"
         android:paddingHorizontal="14dp"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
+        android:textColorHint="@color/app_input_hint"
         android:textSize="14sp" />
 
     <TextView
@@ -62,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
         android:text="* VÍ DỤ MINH HỌA"
-        android:textColor="#475569"
+        android:textColor="@color/app_text_secondary"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -77,7 +79,8 @@
         android:importantForAutofill="no"
         android:inputType="textMultiLine"
         android:padding="12dp"
-        android:textColor="#0F172A"
+        android:textColor="@color/app_text_primary"
+        android:textColorHint="@color/app_input_hint"
         android:textSize="14sp" />
 
 </LinearLayout>

@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -106,7 +106,7 @@ public class VocabularyFragment extends Fragment implements CollectionAdapter.On
 
     @Override
     public void onDeleteClick(CollectionWithCount item) {
-        new AlertDialog.Builder(requireContext())
+        new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Xóa bộ sưu tập")
                 .setMessage("Bạn có chắc chắn muốn xóa bộ sưu tập \"" + item.collection.getName() + "\"? Tất cả từ vựng trong bộ này cũng sẽ bị xóa.")
                 .setPositiveButton("Xóa", (dialog, which) -> {

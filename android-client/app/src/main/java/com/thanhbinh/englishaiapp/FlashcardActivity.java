@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.thanhbinh.englishaiapp.data.local.AppDatabase;
 import com.thanhbinh.englishaiapp.data.local.entity.VocabularyEntity;
 import com.thanhbinh.englishaiapp.databinding.ActivityFlashcardBinding;
@@ -27,6 +28,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
     private long collectionId;
     private String collectionName;
+    private int startIndex = 0;
     private List<VocabularyEntity> vocabList = new ArrayList<>();
     private int currentIndex = 0;
     private boolean isBackShowing = false;
@@ -46,6 +48,7 @@ public class FlashcardActivity extends AppCompatActivity {
 
         collectionId = getIntent().getLongExtra("collection_id", -1);
         collectionName = getIntent().getStringExtra("collection_name");
+        startIndex = getIntent().getIntExtra("start_index", 0);
 
         if (collectionId == -1) {
             finish();
@@ -90,7 +93,7 @@ public class FlashcardActivity extends AppCompatActivity {
                     return;
                 }
                 vocabList = list;
-                currentIndex = 0;
+                currentIndex = Math.max(0, Math.min(startIndex, vocabList.size() - 1));
                 showCard(currentIndex);
             });
         });
@@ -168,7 +171,7 @@ public class FlashcardActivity extends AppCompatActivity {
     }
 
     private void showCompletionDialog() {
-        new AlertDialog.Builder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle("🎉 Hoàn thành lượt học!")
                 .setMessage("Bạn đã xem hết tất cả các thẻ từ vựng trong bộ này. Tiếp tục ôn tập lại?")
                 .setPositiveButton("Học lại từ đầu", (dialog, which) -> {

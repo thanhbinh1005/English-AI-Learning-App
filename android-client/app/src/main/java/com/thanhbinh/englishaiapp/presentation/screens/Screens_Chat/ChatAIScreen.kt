@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.thanhbinh.englishaiapp.data.local.entity.ChatSessionEntity
 import com.thanhbinh.englishaiapp.data.model.ChatMessage
 import com.thanhbinh.englishaiapp.presentation.viewmodel.chat.ChatViewModel
 import com.thanhbinh.englishaiapp.ui.theme.EnglishAIAppTheme
@@ -51,6 +52,9 @@ fun ChatAIScreen(
     onNavigateBack: (() -> Unit)? = null,
     viewModel: ChatViewModel = viewModel()
 ) {
+    val sessions by viewModel.sessions.collectAsState()
+    val currentSession by viewModel.currentSession.collectAsState()
+    val currentSessionId by viewModel.currentSessionId.collectAsState()
     val messages by viewModel.messages.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val inputText by viewModel.inputText.collectAsState()
@@ -58,6 +62,10 @@ fun ChatAIScreen(
     val listState = rememberLazyListState()
     val keyboardController = LocalSoftwareKeyboardController.current
     val context = LocalContext.current
+
+    var showHistorySheet by remember { mutableStateOf(false) }
+    var sessionToDelete by remember { mutableStateOf<ChatSessionEntity?>(null) }
+    var showServerConfigDialog by remember { mutableStateOf(false) }
 
     // Tự động cuộn xuống dưới cùng khi có tin nhắn mới hoặc trạng thái loading thay đổi
     LaunchedEffect(messages.size, isLoading) {
@@ -73,11 +81,204 @@ fun ChatAIScreen(
         "Cho mình 5 từ vựng giao tiếp hôm nay"
     )
 
-    var showServerConfigDialog by remember { mutableStateOf(false) }
-
     if (showServerConfigDialog) {
         com.thanhbinh.englishaiapp.presentation.components.ServerConfigDialog(
             onDismissRequest = { showServerConfigDialog = false }
+        )
+    }
+
+    // Modal BottomSheet: Danh sách lịch sử các cuộc hội thoại (Chat Sessions)
+    if (showHistorySheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showHistorySheet = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Lịch sử trò chuyện",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    IconButton(onClick = { showHistorySheet = false }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Đóng",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Nút tạo đoạn chat mới nổi bật
+                Button(
+                    onClick = {
+                        viewModel.createNewChat()
+                        showHistorySheet = false
+                        Toast.makeText(context, "Đã tạo cuộc trò chuyện mới!", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Bắt đầu cuộc trò chuyện mới",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 15.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Các cuộc trò chuyện gần đây",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (sessions.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Chưa có lịch sử trò chuyện nào.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 400.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(sessions, key = { it.id }) { session ->
+                            val isSelected = session.id == currentSessionId
+                            val sdf = SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault())
+                            val dateStr = sdf.format(Date(session.updatedAt))
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        viewModel.selectSession(session.id)
+                                        showHistorySheet = false
+                                    },
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) {
+                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                    }
+                                ),
+                                border = if (isSelected) {
+                                    androidx.compose.foundation.BorderStroke(
+                                        1.5.dp,
+                                        MaterialTheme.colorScheme.primary
+                                    )
+                                } else null
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = if (isSelected) Icons.Default.ChatBubble else Icons.Default.ChatBubbleOutline,
+                                        contentDescription = null,
+                                        tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = session.title,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1
+                                        )
+                                        Spacer(modifier = Modifier.height(2.dp))
+                                        Text(
+                                            text = dateStr,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontSize = 11.sp,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+
+                                    IconButton(
+                                        onClick = { sessionToDelete = session },
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.DeleteOutline,
+                                            contentDescription = "Xóa cuộc trò chuyện",
+                                            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.8f),
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
+
+    // Dialog xác nhận xóa cuộc trò chuyện
+    if (sessionToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { sessionToDelete = null },
+            title = { Text("Xóa cuộc trò chuyện", fontWeight = FontWeight.Bold) },
+            text = { Text("Bạn có chắc muốn xóa cuộc trò chuyện \"${sessionToDelete?.title}\"? Toàn bộ tin nhắn trong phiên này sẽ bị xóa.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        sessionToDelete?.let { viewModel.deleteSession(it.id) }
+                        sessionToDelete = null
+                        Toast.makeText(context, "Đã xóa cuộc trò chuyện", Toast.LENGTH_SHORT).show()
+                    }
+                ) {
+                    Text("Xóa", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { sessionToDelete = null }) {
+                    Text("Hủy")
+                }
+            }
         )
     }
 
@@ -85,11 +286,20 @@ fun ChatAIScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
-                    if (onNavigateBack != null) {
-                        IconButton(onClick = onNavigateBack) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (onNavigateBack != null) {
+                            IconButton(onClick = onNavigateBack) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Quay lại"
+                                )
+                            }
+                        }
+                        IconButton(onClick = { showHistorySheet = true }) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Quay lại"
+                                imageVector = Icons.Default.History,
+                                contentDescription = "Lịch sử trò chuyện",
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -98,38 +308,42 @@ fun ChatAIScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.clickable { showServerConfigDialog = true }
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { showHistorySheet = true }
+                            .padding(horizontal = 6.dp, vertical = 4.dp)
                     ) {
                         Surface(
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.primaryContainer,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(34.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.AutoAwesome,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }
-                        Column {
+                        Column(modifier = Modifier.widthIn(max = 160.dp)) {
                             Text(
-                                text = "Trợ lý AI Ngôn ngữ",
+                                text = currentSession?.title ?: "Trợ lý AI Ngôn ngữ",
                                 fontWeight = FontWeight.Bold,
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     modifier = Modifier
-                                        .size(8.dp)
+                                        .size(7.dp)
                                         .clip(CircleShape)
                                         .background(Color(0xFF4CAF50))
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "Online (${com.thanhbinh.englishaiapp.utils.AppConfig.currentServerIp})",
+                                    text = "Llama 3.1",
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -138,20 +352,20 @@ fun ChatAIScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        viewModel.createNewChat()
+                        Toast.makeText(context, "Đã bắt đầu cuộc trò chuyện mới!", Toast.LENGTH_SHORT).show()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.AddComment,
+                            contentDescription = "Cuộc trò chuyện mới",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     IconButton(onClick = { showServerConfigDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.Settings,
                             contentDescription = "Cấu hình Server",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    IconButton(onClick = {
-                        viewModel.clearChat()
-                        Toast.makeText(context, "Đã làm mới cuộc hội thoại", Toast.LENGTH_SHORT).show()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Làm mới đoạn chat",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -206,53 +420,24 @@ fun ChatAIScreen(
                 }
             }
 
-            // 2. Gợi ý câu hỏi nhanh (Suggestion Chips)
-            AnimatedVisibility(
-                visible = !isLoading && messages.size <= 2,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                LazyRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(suggestionPrompts) { prompt ->
-                        SuggestionChip(
-                            onClick = {
-                                viewModel.sendMessage(prompt)
-                            },
-                            label = {
-                                Text(
-                                    text = prompt,
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            colors = SuggestionChipDefaults.suggestionChipColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                            ),
-                            border = SuggestionChipDefaults.suggestionChipBorder(
-                                enabled = true,
-                                borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                            ),
-                            shape = RoundedCornerShape(16.dp)
-                        )
+            // 2. Gợi ý các câu hỏi nhanh (Quick Prompts)
+            if (messages.size <= 2 && !isLoading) {
+                QuickPromptsSection(
+                    prompts = suggestionPrompts,
+                    onPromptClick = { prompt ->
+                        viewModel.sendMessage(prompt)
                     }
-                }
+                )
             }
 
-            // 3. Khung nhập tin nhắn ở dưới cùng
+            // 3. Khung nhập liệu Chat (Input Bar)
             ChatInputBar(
                 inputText = inputText,
                 onInputChanged = { viewModel.onInputTextChanged(it) },
                 isLoading = isLoading,
                 onSendMessage = {
-                    if (inputText.isNotBlank()) {
-                        viewModel.sendMessage()
-                        keyboardController?.hide()
-                    }
+                    keyboardController?.hide()
+                    viewModel.sendMessage(inputText)
                 }
             )
         }
@@ -261,12 +446,12 @@ fun ChatAIScreen(
 
 @Composable
 fun ChatHeaderBanner() {
-    Card(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
     ) {
         Row(
             modifier = Modifier.padding(14.dp),
@@ -275,30 +460,29 @@ fun ChatHeaderBanner() {
             Surface(
                 shape = CircleShape,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(42.dp)
+                modifier = Modifier.size(36.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
-                        imageVector = Icons.Default.SmartToy,
+                        imageVector = Icons.Default.Psychology,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "Luyện tiếng Anh thông minh",
+                    text = "Trợ lý AI Tiếng Anh",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Sử dụng mô hình Llama 3.1 phân tích ngữ nghĩa và phản hồi trực tiếp",
+                    text = "Mô hình ngôn ngữ lớn Llama 3.1 hỗ trợ giải đáp & luyện tập 24/7.",
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 16.sp
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -311,53 +495,47 @@ fun ChatBubbleItem(
     onCopyText: (String) -> Unit
 ) {
     val isUser = message.isUser
-    val isError = message.isError
-
     val alignment = if (isUser) Alignment.End else Alignment.Start
+    val bubbleShape = if (isUser) {
+        RoundedCornerShape(topStart = 18.dp, topEnd = 4.dp, bottomStart = 18.dp, bottomEnd = 18.dp)
+    } else {
+        RoundedCornerShape(topStart = 4.dp, topEnd = 18.dp, bottomStart = 18.dp, bottomEnd = 18.dp)
+    }
+
     val bubbleColor = when {
-        isError -> MaterialTheme.colorScheme.errorContainer
+        message.isError -> MaterialTheme.colorScheme.errorContainer
         isUser -> MaterialTheme.colorScheme.primary
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
 
-    val contentColor = when {
-        isError -> MaterialTheme.colorScheme.onErrorContainer
+    val textColor = when {
+        message.isError -> MaterialTheme.colorScheme.onErrorContainer
         isUser -> MaterialTheme.colorScheme.onPrimary
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    val bubbleShape = if (isUser) {
-        RoundedCornerShape(18.dp, 18.dp, 4.dp, 18.dp)
-    } else {
-        RoundedCornerShape(18.dp, 18.dp, 18.dp, 4.dp)
-    }
-
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = alignment
     ) {
         Row(
-            horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
             verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.fillMaxWidth(0.9f)
+            horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+            modifier = Modifier.fillMaxWidth(0.92f)
         ) {
-            // Icon cho AI bên trái
             if (!isUser) {
                 Surface(
                     shape = CircleShape,
-                    color = if (isError) MaterialTheme.colorScheme.error.copy(alpha = 0.15f)
-                    else MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier
-                        .size(30.dp)
+                        .size(28.dp)
                         .padding(bottom = 2.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
-                            imageVector = if (isError) Icons.Default.Warning else Icons.Default.AutoAwesome,
-                            contentDescription = null,
-                            tint = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = "AI",
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -365,31 +543,43 @@ fun ChatBubbleItem(
                 Spacer(modifier = Modifier.width(8.dp))
             }
 
-            // Bong bóng tin nhắn
-            Card(
+            Surface(
                 shape = bubbleShape,
-                colors = CardDefaults.cardColors(containerColor = bubbleColor),
-                elevation = CardDefaults.cardElevation(defaultElevation = if (isUser) 2.dp else 0.dp),
-                modifier = Modifier
-                    .weight(1f, fill = false)
-                    .clickable { onCopyText(message.text) }
+                color = bubbleColor,
+                shadowElevation = if (isUser) 2.dp else 1.dp,
+                modifier = Modifier.widthIn(max = 290.dp)
             ) {
-                Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                Column(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                ) {
                     Text(
                         text = message.text,
-                        color = contentColor,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 15.sp,
-                            lineHeight = 22.sp
-                        )
+                        color = textColor,
+                        fontSize = 15.sp,
+                        lineHeight = 22.sp
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = formatChatTime(message.timestamp),
-                        fontSize = 10.sp,
-                        color = contentColor.copy(alpha = 0.65f),
-                        modifier = Modifier.align(Alignment.End)
-                    )
+
+                    // Thanh công cụ nhỏ bên dưới phản hồi của AI (Copy)
+                    if (!isUser && !message.isError) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = { onCopyText(message.text) },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ContentCopy,
+                                    contentDescription = "Sao chép",
+                                    tint = textColor.copy(alpha = 0.6f),
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -398,74 +588,28 @@ fun ChatBubbleItem(
 
 @Composable
 fun AITypingIndicator() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier.size(30.dp)
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Default.AutoAwesome,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Card(
-            shape = RoundedCornerShape(18.dp, 18.dp, 18.dp, 4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Row(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(
-                    text = "AI đang suy nghĩ...",
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                )
-                DotPulsingAnimation()
-            }
-        }
-    }
-}
-
-@Composable
-fun DotPulsingAnimation() {
-    val infiniteTransition = rememberInfiniteTransition(label = "dots")
-    val alpha1 by infiniteTransition.animateFloat(
+    val infiniteTransition = rememberInfiniteTransition(label = "typing_dots")
+    val dot1Alpha by infiniteTransition.animateFloat(
         initialValue = 0.2f,
-        targetValue = 1f,
+        targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
-            animation = tween(600, easing = LinearEasing),
+            animation = tween(600, delayMillis = 0, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "dot1"
     )
-    val alpha2 by infiniteTransition.animateFloat(
+    val dot2Alpha by infiniteTransition.animateFloat(
         initialValue = 0.2f,
-        targetValue = 1f,
+        targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
             animation = tween(600, delayMillis = 200, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "dot2"
     )
-    val alpha3 by infiniteTransition.animateFloat(
+    val dot3Alpha by infiniteTransition.animateFloat(
         initialValue = 0.2f,
-        targetValue = 1f,
+        targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
             animation = tween(600, delayMillis = 400, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
@@ -473,10 +617,79 @@ fun DotPulsingAnimation() {
         label = "dot3"
     )
 
-    Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = alpha1)))
-        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = alpha2)))
-        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primary.copy(alpha = alpha3)))
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(start = 36.dp, top = 4.dp, bottom = 4.dp)
+    ) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = "AI đang suy nghĩ",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = dot1Alpha))
+                )
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = dot2Alpha))
+                )
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = dot3Alpha))
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun QuickPromptsSection(
+    prompts: List<String>,
+    onPromptClick: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+    ) {
+        Text(
+            text = "Gợi ý câu hỏi nhanh:",
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+        )
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(prompts) { prompt ->
+                SuggestionChip(
+                    onClick = { onPromptClick(prompt) },
+                    label = { Text(prompt, fontSize = 13.sp) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = SuggestionChipDefaults.suggestionChipColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                )
+            }
+        }
     }
 }
 
@@ -520,50 +733,43 @@ fun ChatInputBar(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                 ),
+                maxLines = 4,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                keyboardActions = KeyboardActions(
-                    onSend = {
-                        if (isSendEnabled) {
-                            onSendMessage()
-                        }
-                    }
-                ),
-                maxLines = 4
+                keyboardActions = KeyboardActions(onSend = {
+                    if (isSendEnabled) onSendMessage()
+                })
             )
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Nút Gửi (Disabled khi chưa nhập nội dung hoặc đang đợi phản hồi)
+            // Nút gửi tin nhắn hình tròn
             IconButton(
                 onClick = onSendMessage,
                 enabled = isSendEnabled,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(46.dp)
+                    .clip(CircleShape)
                     .background(
-                        color = if (isSendEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-                        shape = CircleShape
+                        if (isSendEnabled) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.surfaceVariant
                     )
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Gửi tin nhắn",
-                    tint = if (isSendEnabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                    modifier = Modifier.size(20.dp)
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "Gửi",
+                        tint = if (isSendEnabled) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
-    }
-}
-
-fun formatChatTime(timestamp: Long): String {
-    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-    return sdf.format(Date(timestamp))
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ChatAIScreenPreview() {
-    EnglishAIAppTheme {
-        ChatAIScreen()
     }
 }

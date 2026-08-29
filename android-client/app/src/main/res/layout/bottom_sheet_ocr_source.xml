@@ -13,14 +13,14 @@
         android:layout_height="4dp"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
-        android:background="#D1D9E6" />
+        android:background="@color/app_border" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:text="Quét &amp; Dịch bằng hình ảnh"
-        android:textColor="#1E293B"
+        android:textColor="@color/app_text_primary"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:text="Chọn nguồn hình ảnh chứa văn bản cần dịch"
-        android:textColor="#64748B"
+        android:textColor="@color/app_text_secondary"
         android:textSize="13sp" />
 
     <!-- Option 1: Camera -->
@@ -40,10 +40,10 @@
         android:layout_marginBottom="12dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardBackgroundColor="#F8FAFC"
+        app:cardBackgroundColor="@color/app_surface"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-        app:strokeColor="#E2E8F0"
+        app:strokeColor="@color/app_border"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -59,7 +59,7 @@
                 android:background="@drawable/bg_badge"
                 android:padding="10dp"
                 android:src="@drawable/ic_camera"
-                app:tint="#0D6EFD" />
+                app:tint="@color/app_accent" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chụp ảnh từ Camera"
-                    android:textColor="#1E293B"
+                    android:textColor="@color/app_text_primary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Chụp tài liệu, sách, bảng hiệu cần dịch"
-                    android:textColor="#64748B"
+                    android:textColor="@color/app_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
@@ -95,10 +95,10 @@
         android:layout_marginBottom="8dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardBackgroundColor="#F8FAFC"
+        app:cardBackgroundColor="@color/app_surface"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-        app:strokeColor="#E2E8F0"
+        app:strokeColor="@color/app_border"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -114,7 +114,7 @@
                 android:background="@drawable/bg_badge"
                 android:padding="10dp"
                 android:src="@drawable/ic_photo_library"
-                app:tint="#0D6EFD" />
+                app:tint="@color/app_accent" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -127,7 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Chọn ảnh từ Thư viện"
-                    android:textColor="#1E293B"
+                    android:textColor="@color/app_text_primary"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
@@ -136,7 +136,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Chọn ảnh chụp màn hình hoặc ảnh có sẵn"
-                    android:textColor="#64748B"
+                    android:textColor="@color/app_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

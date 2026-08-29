@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -103,12 +104,13 @@ public class NewCollectionActivity extends AppCompatActivity {
 
     private void selectColor(int selectedIndex) {
         selectedColorHex = colors[selectedIndex];
+        int accentColor = ContextCompat.getColor(this, R.color.app_accent);
         for (int i = 0; i < colors.length; i++) {
             if (i == selectedIndex) {
                 GradientDrawable ringDrawable = new GradientDrawable();
                 ringDrawable.setShape(GradientDrawable.OVAL);
                 ringDrawable.setColor(Color.TRANSPARENT);
-                ringDrawable.setStroke(8, Color.parseColor("#1E3A8A"));
+                ringDrawable.setStroke(8, accentColor);
                 wrapperViews[i].setBackground(ringDrawable);
             } else {
                 wrapperViews[i].setBackground(null);
@@ -120,10 +122,12 @@ public class NewCollectionActivity extends AppCompatActivity {
         boolean isValid = !folderName.isEmpty();
         binding.btnCreateCollection.setEnabled(isValid);
         if (isValid) {
-            binding.btnCreateCollection.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#0D6EFD")));
+            int activeColor = ContextCompat.getColor(this, R.color.app_accent);
+            binding.btnCreateCollection.setBackgroundTintList(ColorStateList.valueOf(activeColor));
             binding.btnCreateCollection.setTextColor(Color.WHITE);
         } else {
-            binding.btnCreateCollection.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#90A4AE")));
+            int disabledColor = ContextCompat.getColor(this, R.color.app_input_hint);
+            binding.btnCreateCollection.setBackgroundTintList(ColorStateList.valueOf(disabledColor));
             binding.btnCreateCollection.setTextColor(Color.parseColor("#E0E0E0"));
         }
     }
