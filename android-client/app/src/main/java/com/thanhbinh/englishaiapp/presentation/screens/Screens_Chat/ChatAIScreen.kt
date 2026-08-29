@@ -167,6 +167,7 @@ fun ChatAIScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
+                .imePadding()
         ) {
             // 1. Danh sách tin nhắn trò chuyện
             LazyColumn(
@@ -488,7 +489,9 @@ fun ChatInputBar(
     val isSendEnabled = inputText.isNotBlank() && !isLoading
 
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding(),
         color = MaterialTheme.colorScheme.surface,
         shadowElevation = 8.dp
     ) {
