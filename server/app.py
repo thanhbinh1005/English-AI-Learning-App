@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 EnglishAIApp Backend Server (Llama 3.1 + Ollama)
-Supports both Flask (if installed) and Python built-in http.server (zero dependencies).
-Includes smart fallback when Ollama is downloading or offline.
+Supports Flask and Python standard http.server.
+Includes fallback responses when Ollama service is unavailable.
 """
 import os
 import sys
@@ -17,7 +17,7 @@ OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.1")
 PORT = int(os.environ.get("PORT", 5000))
 
 def call_ollama(prompt: str) -> dict:
-    """Gọi Ollama API bằng urllib chuẩn."""
+    """Gui yeu cau den Ollama API su dung thu vien chuan urllib."""
     import urllib.request
     import urllib.error
 
@@ -38,33 +38,32 @@ def call_ollama(prompt: str) -> dict:
 
 def handle_summarize(text: str) -> str:
     prompt = (
-        "Bạn là một chuyên gia ngôn ngữ AI thông minh chuyên phân tích và tóm tắt văn bản. "
-        "Hãy đọc văn bản dưới đây và tóm tắt thành các luận điểm chính ngắn gọn, súc tích, dễ hiểu. "
-        "Trình bày kết quả bằng các gạch đầu dòng rõ ràng bằng tiếng Việt.\n\n"
-        f"Văn bản cần tóm tắt:\n{text}"
+        "Ban la mot chuyen gia ngon ngu AI chuyen phan tich va tom tat van ban. "
+        "Hay doc van ban duoi day va tom tat thanh cac luan diem chinh ngan gon, suc tich, de hieu. "
+        "Trinh bay ket qua bang cac gach dau dong ro rang bang tieng Viet.\n\n"
+        f"Van ban can tom tat:\n{text}"
     )
     try:
-        logger.info(f"Đang gửi văn bản tới Ollama ({OLLAMA_MODEL})...")
+        logger.info(f"Dang gui van ban toi Ollama model: {OLLAMA_MODEL}")
         result = call_ollama(prompt)
         response_text = result.get("response", "").strip()
         if response_text:
             return response_text
-        raise ValueError("Ollama trả về phản hồi rỗng")
+        raise ValueError("Ollama tra ve phan hoi rong")
     except Exception as e:
-        logger.warning(f"⚠️ Không thể kết nối tới Ollama tại {OLLAMA_API_URL} ({e}). Sử dụng bộ tóm tắt thông minh dự phòng...")
-        # Smart summarizer fallback
+        logger.warning(f"Khong the ket noi toi Ollama tai {OLLAMA_API_URL} ({e}). Su dung bo tom tat du phong...")
         sentences = [s.strip() for s in text.replace("\n", ". ").split(".") if len(s.strip()) > 8]
         if not sentences:
             sentences = [text.strip()]
         
         points = sentences[:5]
-        bullet_points = "\n\n".join([f"• {p}." if not p.endswith(".") else f"• {p}" for p in points])
+        bullet_points = "\n\n".join([f"- {p}." if not p.endswith(".") else f"- {p}" for p in points])
         
         return (
-            "📌 **TÓM TẮT LUẬN ĐIỂM CHÍNH (AI Summary)**:\n\n"
+            "TOM TAT LUAN DIEM CHINH (AI Summary):\n\n"
             f"{bullet_points}\n\n"
-            "──────────────\n"
-            "💡 *(Ghi chú: Khởi động Ollama bằng lệnh 'ollama run llama3.1' để nhận kết quả suy luận trực tiếp từ mô hình Llama 3.1)*"
+            "----------------------------------------\n"
+            "(Ghi chu: Khoi dong Ollama bang lenh 'ollama run llama3.1' de nhan phan tich truc tiep tu mo hinh Llama 3.1)"
         )
 
 def handle_chat(message: str) -> str:
@@ -77,62 +76,61 @@ def handle_chat(message: str) -> str:
         "Tutor Response:"
     )
     try:
-        logger.info(f"Đang gửi câu hỏi chat tới Ollama ({OLLAMA_MODEL})...")
+        logger.info(f"Dang gui cau hoi chat toi Ollama model: {OLLAMA_MODEL}")
         result = call_ollama(prompt)
         response_text = result.get("response", "").strip()
         if response_text:
             return response_text
-        raise ValueError("Ollama trả về phản hồi rỗng")
+        raise ValueError("Ollama tra ve phan hoi rong")
     except Exception as e:
-        logger.warning(f"⚠️ Không thể kết nối tới Ollama tại {OLLAMA_API_URL} ({e}). Sử dụng phản hồi gia sư thông minh dự phòng...")
+        logger.warning(f"Khong the ket noi toi Ollama tai {OLLAMA_API_URL} ({e}). Su dung phan hoi gia su du phong...")
         lower_msg = message.lower().strip()
         
         if "hiện tại đơn" in lower_msg or "present simple" in lower_msg:
             return (
-                "📚 **Thì Hiện Tại Đơn (Present Simple Tense)**:\n\n"
-                "1. **Công thức**:\n"
-                "   • Khẳng định: `S + V(s/es)` (Ví dụ: *She works hard every day*)\n"
-                "   • Phủ định: `S + do/does + not + V_inf` (Ví dụ: *I do not like coffee*)\n"
-                "   • Nghi vấn: `Do/Does + S + V_inf?` (Ví dụ: *Do you speak English?*)\n\n"
-                "2. **Cách dùng phổ biến**:\n"
-                "   • Diễn tả chân lý, sự thật hiển nhiên: *The sun rises in the east.*\n"
-                "   • Diễn tả thói quen, hành động lặp đi lặp lại: *I brush my teeth twice a day.*\n"
-                "   • Diễn tả lịch trình, thời gian biểu cố định: *The train leaves at 8 PM.*\n\n"
-                "3. **Dấu hiệu nhận biết**: always, usually, often, sometimes, never, every day/month...\n\n"
-                "👉 Bạn có muốn đặt một câu ví dụ để mình kiểm tra giúp không?"
+                "THI HIEN TAI DON (Present Simple Tense):\n\n"
+                "1. Cong thuc:\n"
+                "   - Khang dinh: S + V(s/es) (Vi du: She works hard every day)\n"
+                "   - Phu dinh: S + do/does + not + V_inf (Vi du: I do not like coffee)\n"
+                "   - Nghi van: Do/Does + S + V_inf? (Vi du: Do you speak English?)\n\n"
+                "2. Cach dung:\n"
+                "   - Dien ta chan ly, su that hien nhien (The sun rises in the east).\n"
+                "   - Dien ta thoi quen, hanh dong lap di lap lai (I brush my teeth twice a day).\n"
+                "   - Dien ta lich trinh, thoi gian bieu co dinh (The train leaves at 8 PM).\n\n"
+                "3. Dau hieu nhan biet: always, usually, often, sometimes, never, every day/week..."
             )
         elif "từ vựng" in lower_msg or "vocabulary" in lower_msg or "5 từ" in lower_msg:
             return (
-                "🌟 **5 Từ Vựng Tiếng Anh Giao Tiếp Hữu Ích Hôm Nay**:\n\n"
-                "1. **Accomplish** /əˈkʌm.plɪʃ/ (verb): Đạt được, hoàn thành mục tiêu.\n"
-                "   ↳ *Ví dụ: We can accomplish this goal together.*\n\n"
-                "2. **Persistent** /pəˈsɪs.tənt/ (adjective): Kiên trì, bền bỉ.\n"
-                "   ↳ *Ví dụ: Practice makes perfect if you are persistent.*\n\n"
-                "3. **Fluency** /ˈfluː.ən.si/ (noun): Sự lưu loát, trôi chảy.\n"
-                "   ↳ *Ví dụ: Daily speaking practice boosts your fluency.*\n\n"
-                "4. **Valuable** /ˈvæl.jə.bəl/ (adjective): Quý giá, có giá trị.\n"
-                "   ↳ *Ví dụ: Thank you for your valuable advice.*\n\n"
-                "5. **Effortless** /ˈef.ət.ləs/ (adjective): Dễ dàng, tự nhiên.\n"
-                "   ↳ *Ví dụ: Speaking English will feel effortless with regular practice.*"
+                "5 TU VUNG TIENG ANH GIAO TIEP HANG NGAY:\n\n"
+                "1. Accomplish /əˈkʌm.plɪʃ/ (v): Hoan thanh, dat duoc muc tieu.\n"
+                "   Vi du: We can accomplish this goal together.\n\n"
+                "2. Persistent /pəˈsɪs.tənt/ (adj): Kien tri, ben bi.\n"
+                "   Vi du: Practice makes perfect if you are persistent.\n\n"
+                "3. Fluency /ˈfluː.ən.si/ (n): Su luu loat, troi chay.\n"
+                "   Vi du: Daily speaking practice boosts your fluency.\n\n"
+                "4. Valuable /ˈvæl.jə.bəl/ (adj): Quy gia, co gia tri.\n"
+                "   Vi du: Thank you for your valuable advice.\n\n"
+                "5. Effortless /ˈef.ət.ləs/ (adj): De dang, tu nhien.\n"
+                "   Vi du: Speaking English will feel effortless with regular practice."
             )
         elif "dạy" in lower_msg or "học" in lower_msg or "tiếng anh" in lower_msg:
             return (
-                "Chào bạn! Rất vui được đồng hành cùng bạn trên con đường chinh phục tiếng Anh! 🇬🇧✨\n\n"
-                "Mình có thể hỗ trợ bạn các nội dung sau:\n"
-                "1. **Ngữ pháp**: Giải thích chi tiết 12 thì, câu điều kiện, bị động, mệnh đề quan hệ...\n"
-                "2. **Từ vựng & Thành ngữ**: Học theo chủ đề giao tiếp, IELTS, TOEIC.\n"
-                "3. **Sửa lỗi câu**: Bạn gửi câu tiếng Anh của bạn, mình sẽ sửa và giải thích chi tiết.\n"
-                "4. **Luyện hội thoại**: Nhắn tin trò chuyện tiếng Anh theo tình huống thực tế.\n\n"
-                "Hôm nay bạn muốn bắt đầu với chủ đề nào trước?"
+                "Chao ban! Tro ly AI san sang ho tro ban hoc tieng Anh.\n\n"
+                "Cac chu de ho tro chinh:\n"
+                "1. Ngu phap: 12 thi trong tieng Anh, cau dieu kien, cau bi dong, menh de quan he.\n"
+                "2. Tu vung: Tu vung giao tiep, luyen thi IELTS, TOEIC.\n"
+                "3. Sua loi cau: Sua ngu phap va cach dien dat trong cau.\n"
+                "4. Luyen hoi thoai: Tro chuyen theo cac tinh huong thuc te.\n\n"
+                "Ban co the bat dau bang cach gui cau hoi hoac cau can sua."
             )
         else:
             return (
-                f"Xin chào! Mình đã nhận được câu hỏi của bạn: \"{message}\".\n\n"
-                "🤖 Mình là Trợ lý AI Ngôn ngữ. Bạn có thể gửi cho mình bất kỳ thắc mắc nào về ngữ pháp, bài tập tiếng Anh hoặc câu cần sửa nhé!\n\n"
-                "💡 *(Để kích hoạt toàn bộ mô hình suy luận Llama 3.1 trực tiếp, hãy khởi động Ollama trên máy tính bằng lệnh: `ollama run llama3.1`)*"
+                f"Phan hoi cho cau hoi: \"{message}\"\n\n"
+                "Tro ly AI san sang giai dap thac mac ve ngu phap, tu vung va luyen tap tieng Anh.\n\n"
+                "(Luu y: De kich hoat toan bo mo hinh suy luan Llama 3.1 truc tiep, hay khoi dong Ollama bang lenh: ollama run llama3.1)"
             )
 
-# --- Chế độ 1: Dùng Flask nếu đã cài đặt ---
+# --- Che do 1: Su dung Flask neu da cai dat ---
 def run_flask():
     from flask import Flask, request, jsonify
     app = Flask(__name__)
@@ -152,13 +150,13 @@ def run_flask():
             data = request.get_json(force=True, silent=True) or {}
             text = data.get("text", "").strip()
             if not text:
-                return jsonify({"error": "Văn bản rỗng"}), 400
+                return jsonify({"error": "Van ban rong"}), 400
 
-            logger.info(f"===> [Flask] Tóm tắt văn bản ({len(text)} ký tự)")
+            logger.info(f"[Flask] Nhan yeu cau tom tat van ban ({len(text)} ky tu)")
             summary = handle_summarize(text)
             return jsonify({"summary": summary, "status": "success"}), 200
         except Exception as e:
-            logger.error(f"Lỗi: {e}")
+            logger.error(f"Loi: {e}")
             return jsonify({"error": str(e)}), 500
 
     @app.route("/chat", methods=["POST"])
@@ -167,18 +165,18 @@ def run_flask():
             data = request.get_json(force=True, silent=True) or {}
             message = data.get("message", "").strip()
             if not message:
-                return jsonify({"error": "Tin nhắn rỗng"}), 400
+                return jsonify({"error": "Tin nhan rong"}), 400
 
-            logger.info(f"===> [Flask] Chat AI: '{message}'")
+            logger.info(f"[Flask] Nhan cau hoi Chat AI: '{message}'")
             reply = handle_chat(message)
             return jsonify({"reply": reply, "status": "success"}), 200
         except Exception as e:
-            logger.error(f"Lỗi: {e}")
+            logger.error(f"Loi: {e}")
             return jsonify({"error": str(e)}), 500
 
     app.run(host="0.0.0.0", port=PORT, debug=False)
 
-# --- Chế độ 2: Dùng Python http.server chuẩn (Không cần cài package) ---
+# --- Che do 2: Su dung Python http.server chuan ---
 def run_builtin_server():
     from http.server import HTTPServer, BaseHTTPRequestHandler
 
@@ -223,23 +221,23 @@ def run_builtin_server():
             if self.path == "/summarize":
                 text = data.get("text", "").strip()
                 if not text:
-                    self._send_json(400, {"error": "Văn bản rỗng"})
+                    self._send_json(400, {"error": "Van ban rong"})
                     return
-                logger.info(f"===> [Server] Tóm tắt văn bản ({len(text)} ký tự)")
+                logger.info(f"[Server] Nhan yeu cau tom tat van ban ({len(text)} ky tu)")
                 summary = handle_summarize(text)
                 self._send_json(200, {"summary": summary, "status": "success"})
 
             elif self.path == "/chat":
                 message = data.get("message", "").strip()
                 if not message:
-                    self._send_json(400, {"error": "Tin nhắn rỗng"})
+                    self._send_json(400, {"error": "Tin nhan rong"})
                     return
-                logger.info(f"===> [Server] Chat AI: '{message}'")
+                logger.info(f"[Server] Nhan cau hoi Chat AI: '{message}'")
                 reply = handle_chat(message)
                 self._send_json(200, {"reply": reply, "status": "success"})
 
             else:
-                self._send_json(404, {"error": f"Endpoint '{self.path}' không tồn tại"})
+                self._send_json(404, {"error": f"Endpoint '{self.path}' khong ton tai"})
 
         def log_message(self, format, *args):
             logger.info(f"{self.address_string()} - {format % args}")
@@ -248,25 +246,25 @@ def run_builtin_server():
         allow_reuse_address = True
 
     httpd = ReusableHTTPServer(("0.0.0.0", PORT), AIRequestHandler)
-    logger.info(f"🚀 HTTP Server đang lắng nghe tại: http://0.0.0.0:{PORT}")
+    logger.info(f"HTTP Server dang lang nghe tai: http://0.0.0.0:{PORT}")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
-        logger.info("Đã dừng server.")
+        logger.info("Da dung server.")
 
 if __name__ == "__main__":
     print("=" * 65)
-    print("🚀 EnglishAI Server (Llama 3.1 + Ollama) đang khởi động...")
-    print(f"📡 Đang lắng nghe: http://0.0.0.0:{PORT}")
-    print(f"🤖 Mô hình Ollama: {OLLAMA_MODEL} (tại {OLLAMA_API_URL})")
-    print(f"📌 Endpoint Tóm tắt: POST http://localhost:{PORT}/summarize")
-    print(f"📌 Endpoint Chat AI:  POST http://localhost:{PORT}/chat")
+    print("EnglishAI Server (Llama 3.1 + Ollama) khoi dong...")
+    print(f"Dia chi lang nghe: http://0.0.0.0:{PORT}")
+    print(f"Mo hinh Ollama:    {OLLAMA_MODEL} (tai {OLLAMA_API_URL})")
+    print(f"Endpoint Tom tat:  POST http://localhost:{PORT}/summarize")
+    print(f"Endpoint Chat AI:  POST http://localhost:{PORT}/chat")
     print("=" * 65)
 
     try:
         import flask
-        logger.info("Phát hiện Flask đã cài đặt. Chạy server bằng Flask...")
+        logger.info("Phat hien Flask da cai dat. Chay server bang Flask...")
         run_flask()
     except ImportError:
-        logger.info("Flask chưa được cài đặt. Tự động chuyển sang Python Built-in HTTP Server...")
+        logger.info("Flask chua duoc cai dat. Tu dong chuyen sang Python Built-in HTTP Server...")
         run_builtin_server()

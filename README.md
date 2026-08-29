@@ -1,157 +1,181 @@
-# 📱 English-AI-Learning-App
+# English AI Learning App
 
-Ứng dụng học tiếng Anh thông minh hỗ trợ bởi Trí tuệ Nhân tạo (**Llama 3.1**) kết hợp nhận diện văn bản OCR và quản lý học tập cá nhân hóa.
-
----
-
-## 🌟 Các tính năng chính
-
-- 🤖 **Trợ lý Chat AI Ngôn ngữ (Llama 3.1)**: Hỏi đáp ngữ pháp, tra từ vựng, sửa lỗi câu và luyện hội thoại tiếng Anh thời gian thực.
-- 📄 **Tóm tắt văn bản bằng AI (Llama 3.1)**: Cô đọng các tài liệu, bài đọc dài thành các luận điểm chính ngắn gọn, dễ hiểu.
-- 📷 **Quét tài liệu & OCR**: Chụp ảnh hoặc chọn tài liệu để trích xuất văn bản tức thì.
-- 📚 **Học từ vựng & Flashcards**: Lưu trữ thư mục từ vựng, ôn tập theo phương pháp lặp lại ngắt quãng.
-- 🌐 **Dịch văn bản**: Hỗ trợ dịch nhanh nội dung học tập.
+Ứng dụng hỗ trợ học tiếng Anh thông minh được tích hợp mô hình ngôn ngữ lớn (Llama 3.1), kết hợp công nghệ nhận diện ký tự quang học (OCR) và hệ thống quản lý học tập cá nhân hóa.
 
 ---
 
-## 🛠️ Hướng dẫn Cài đặt & Setup AI (Ollama + Llama 3.1)
+## 1. Tổng quan hệ thống
 
-> **Người thực hiện**: Nguyễn Đăng Khôi  
-> **Tính năng phụ trách**: 
-> 1. *Use case “Chat với AI”* (Trợ lý ngôn ngữ Llama 3.1)
-> 2. *Use case “Tóm tắt văn bản bằng AI”* (Cô đọng văn bản thông minh)
+English AI Learning App là một ứng dụng di động Android kết hợp với máy chủ xử lý cục bộ (Local Backend Server) và mô hình Trí tuệ Nhân tạo chạy trên Ollama. Hệ thống cung cấp giải pháp toàn diện cho việc tự học tiếng Anh thông qua tương tác đối thoại thông minh và cô đọng tài liệu học tập.
 
-Hệ thống AI chạy cục bộ (Local) trên máy tính thông qua **Ollama** và được kết nối tới ứng dụng Android qua **Server Python trung gian**.
+### Các tính năng chính
+
+- **Trợ lý Chat AI Ngôn ngữ**: Hỗ trợ hỏi đáp ngữ pháp, giải thích từ vựng, sửa lỗi diễn đạt và luyện tập hội thoại tiếng Anh thời gian thực.
+- **Tóm tắt văn bản bằng AI**: Phân tích cú pháp và trích xuất các luận điểm chính từ các đoạn văn bản dài hoặc tài liệu được quét.
+- **Quét tài liệu & OCR**: Chụp ảnh hoặc tải lên tài liệu hình ảnh để trích xuất văn bản tự động.
+- **Học từ vựng & Flashcards**: Tổ chức từ vựng theo thư mục và hỗ trợ ôn tập ngắt quãng.
+- **Dịch thuật**: Hỗ trợ dịch nhanh nội dung văn bản.
 
 ---
 
-### 1. Cài đặt Ollama trên máy tính
+## 2. Hướng dẫn Cài đặt & Cấu hình Mô hình AI (Ollama + Llama 3.1)
 
-#### Trên Linux / Ubuntu / WSL:
-Chạy lệnh cài đặt chính thức bằng 1 dòng lệnh:
+> **Thành viên thực hiện**: Nguyễn Đăng Khôi  
+> **Phạm vi chức năng**:
+> - Use case: "Chat với AI" (Trợ lý ngôn ngữ tương tác với Llama 3.1)
+> - Use case: "Tóm tắt văn bản bằng AI" (Trích xuất luận điểm tự động)
+
+Hệ thống AI được thiết kế để chạy trực tiếp trên máy tính cá nhân thông qua **Ollama**, kết nối với ứng dụng Android qua **Server trung gian (Python)**.
+
+---
+
+### Bước 1: Cài đặt Ollama
+
+#### Trên Linux / Ubuntu / WSL
+Thực thi lệnh cài đặt tự động từ trang chủ Ollama:
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-#### Trên Windows / macOS:
-- Tải bộ cài đặt trực tiếp tại trang chủ: [https://ollama.com/download](https://ollama.com/download)
-- Cài đặt như phần mềm thông thường.
+#### Trên Windows / macOS
+- Tải bộ cài đặt chính thức tại: https://ollama.com/download
+- Tiến hành cài đặt theo hướng dẫn của hệ điều hành.
 
 ---
 
-### 2. Tải và Khởi động mô hình Llama 3.1
+### Bước 2: Tải và khởi chạy mô hình Llama 3.1
 
-Mở Terminal / Command Prompt trên máy tính và chạy:
+Mở Terminal trên máy tính và thực thi:
 
 ```bash
 ollama run llama3.1
 ```
 
-> 💡 **Lưu ý về cấu hình máy tính:**
-> - **Máy có RAM $\ge$ 8GB - 16GB**: Khuyên dùng `llama3.1` (kích thước ~4.7 GB).
-> - **Máy có cấu hình nhẹ hơn (RAM < 8GB)**: Có thể dùng mô hình siêu nhẹ `llama3.2` (~2.0 GB, phản hồi cực nhanh):
->   ```bash
->   ollama run llama3.2
->   ```
->   *(Nếu dùng `llama3.2`, bạn chỉ cần khai báo biến trước khi bật server: `export OLLAMA_MODEL="llama3.2"`)*.
+#### Lưu ý về yêu cầu phần cứng và mô hình thay thế:
+- **Cấu hình tiêu chuẩn (RAM >= 8GB - 16GB)**: Khuyên dùng `llama3.1` (dung lượng xấp xỉ 4.7 GB).
+- **Cấu hình tối giản (RAM < 8GB)**: Có thể sử dụng mô hình `llama3.2` (dung lượng xấp xỉ 2.0 GB, tốc độ xử lý nhanh):
+  ```bash
+  ollama run llama3.2
+  ```
+  *(Khi sử dụng `llama3.2`, thiết lập biến môi trường trước khi chạy server: `export OLLAMA_MODEL="llama3.2"`)*.
 
-Kiểm tra Ollama đã sẵn sàng hoạt động tại cổng `11434`:
+Kiểm tra trạng thái hoạt động của dịch vụ Ollama tại cổng `11434`:
 ```bash
 curl http://localhost:11434/api/tags
 ```
 
 ---
 
-### 3. Khởi động Backend Server Python
+### Bước 3: Khởi chạy Backend Server trung gian
 
-Server Python đóng vai trò cầu nối tiếp nhận yêu cầu từ ứng dụng Android (Endpoint `/chat` và `/summarize`) và gọi Ollama xử lý.
+Backend Server tiếp nhận yêu cầu từ ứng dụng Android tại các endpoint `/chat` và `/summarize`, sau đó chuyển tiếp dữ liệu đến Ollama để xử lý.
 
-1. Di chuyển vào thư mục `server`:
+1. Di chuyển vào thư mục chứa server:
    ```bash
    cd server
    ```
-2. Chạy server:
+2. Khởi chạy server:
    ```bash
    python3 app.py
    ```
 
-Server hỗ trợ chạy trực tiếp với thư viện chuẩn của Python (không bắt buộc cài thêm thư viện ngoài). Khi khởi động thành công, màn hình sẽ hiển thị:
+Server được tích hợp sẵn cơ chế tương thích, có thể chạy trực tiếp bằng thư viện chuẩn của Python hoặc thông qua Flask.
+
+Thông tin hiển thị khi khởi động thành công:
 ```text
 =================================================================
-🚀 EnglishAI Server (Llama 3.1 + Ollama) đang khởi động...
-📡 Đang lắng nghe: http://0.0.0.0:5000
-🤖 Mô hình Ollama: llama3.1 (tại http://localhost:11434/api/generate)
-📌 Endpoint Tóm tắt: POST http://localhost:5000/summarize
-📌 Endpoint Chat AI:  POST http://localhost:5000/chat
+EnglishAI Server (Llama 3.1 + Ollama) khoi dong...
+Dia chi lang nghe: http://0.0.0.0:5000
+Mo hinh Ollama:    llama3.1 (tai http://localhost:11434/api/generate)
+Endpoint Tom tat:  POST http://localhost:5000/summarize
+Endpoint Chat AI:  POST http://localhost:5000/chat
 =================================================================
 ```
 
 ---
 
-### 4. Kết nối Điện thoại Android với Máy tính
+### Bước 4: Thiết lập kết nối giữa Điện thoại Android và Máy tính
 
-Ứng dụng hỗ trợ linh hoạt cả **Cáp USB** và **Mạng Wifi LAN**:
+Ứng dụng hỗ trợ hai phương thức kết nối:
 
-#### 🔌 Cách 1: Kết nối qua cáp USB Debugging (Khuyên dùng - Ổn định & Nhanh nhất)
-1. Cắm cáp USB nối điện thoại với máy tính, bật **USB Debugging** (Gỡ lỗi USB) trên điện thoại.
-2. Trên máy tính, mở Terminal / CMD và chạy lệnh chuyển tiếp cổng:
+#### Phương thức 1: Kết nối qua cáp USB (ADB Reverse Port Forwarding - Khuyên dùng)
+1. Kết nối điện thoại với máy tính qua cáp USB và kích hoạt chế độ **USB Debugging (Gỡ lỗi USB)** trên điện thoại.
+2. Trên máy tính, mở Terminal và chạy lệnh chuyển tiếp cổng:
    ```bash
    adb reverse tcp:5000 tcp:5000
    ```
-3. Mở ứng dụng Android, hệ thống sẽ tự động kết nối qua `127.0.0.1:5000`.
+3. Mở ứng dụng Android, hệ thống sẽ tự động giao tiếp với máy tính qua địa chỉ `127.0.0.1:5000`.
 
-#### 📶 Cách 2: Kết nối qua mạng Wifi LAN (Không cần dây cáp)
-1. Đảm bảo điện thoại và máy tính kết nối **chung một mạng Wifi**.
-2. Tìm địa chỉ IP nội bộ của máy tính:
-   - **Windows**: Chạy `cmd` $\rightarrow$ gõ `ipconfig` $\rightarrow$ xem `IPv4 Address` (ví dụ: `192.168.1.50` hoặc `10.20.247.xxx`).
-   - **Linux**: Chạy `hostname -I`.
-   - **macOS**: Chạy `ipconfig getifaddr en0`.
-3. Trong ứng dụng Android:
-   - Nhấn vào biểu tượng **⚙️ (Cài đặt Server)** ở góc trên màn hình Chat AI hoặc Chi tiết văn bản.
-   - Nhập IP máy tính vừa tìm được và bấm **"Lưu & Áp dụng"**.
+#### Phương thức 2: Kết nối qua mạng Wi-Fi LAN
+1. Đảm bảo điện thoại và máy tính kết nối vào cùng một mạng Wi-Fi.
+2. Lấy địa chỉ IPv4 nội bộ của máy tính:
+   - **Linux**: Chạy lệnh `hostname -I` (lấy địa chỉ IP đầu tiên).
+   - **Windows**: Mở Command Prompt, chạy `ipconfig` và xem giá trị `IPv4 Address`.
+   - **macOS**: Chạy lệnh `ipconfig getifaddr en0`.
+3. Cấu hình trên ứng dụng Android:
+   - Mở màn hình **Chat AI** hoặc **Chi tiết văn bản (Tóm tắt AI)**.
+   - Nhấn vào biểu tượng **Cài đặt Server** trên thanh tiêu đề.
+   - Nhập địa chỉ IPv4 của máy tính (ví dụ: `192.168.1.50`), nhấn **Kiểm tra** và bấm **Lưu & Áp dụng**.
 
 ---
 
+## 3. Hướng dẫn Kiểm thử & Vận hành 2 Use Case
 
+### Use case 1: "Chat với AI" (Language Tutor Assistant)
+1. Tại màn hình chính, chọn mục **Trợ lý Chat AI** (hoặc chọn tab **Chat AI** trên thanh điều hướng phía dưới).
+2. Nhập câu hỏi vào khung nhập liệu (ví dụ: *"hiện tại đơn là thì như nào"*, *"dạy mình 5 từ vựng giao tiếp"*, *"sửa lỗi câu: I goes to school"*), hoặc chọn các thẻ câu hỏi gợi ý nhanh.
+3. Tin nhắn của người dùng hiển thị ở bong bóng phía bên phải.
+4. Hệ thống kích hoạt hiệu ứng chờ xử lý trong thời gian mô hình suy luận.
+5. Phản hồi từ mô hình Llama 3.1 hiển thị tại bong bóng phía bên trái, danh sách tự động cuộn xuống dưới cùng.
+6. Người dùng có thể chạm vào tin nhắn để sao chép nội dung vào bộ nhớ tạm.
 
-## 🏗️ Cấu trúc thư mục dự án
+### Use case 2: "Tóm tắt văn bản bằng AI" (Text Summarization)
+1. Chọn tab **Quét** trên thanh điều hướng phía dưới.
+2. Nhấn nút **Quét tài liệu mới** (để trích xuất từ camera/ảnh) hoặc nhấn **Mở văn bản mẫu thử Tóm tắt AI** / nhấn **Xem** trên một tài liệu đã lưu.
+3. Tại màn hình **Chi tiết văn bản**, nhấn vào tab **Tóm tắt AI**.
+4. Ứng dụng hiển thị vòng xoay tải dữ liệu và gửi yêu cầu `POST /summarize` kèm nội dung văn bản thô lên server.
+5. Mô hình Llama 3.1 phân tích ngữ nghĩa và trả về danh sách các luận điểm chính ngắn gọn, trực quan.
+
+---
+
+## 4. Cấu trúc thư mục dự án
 
 ```text
 English-AI-Learning-App/
-├── README.md                           # Tài liệu hướng dẫn dự án
+├── README.md                           # Tài liệu kỹ thuật dự án
 ├── server/                             # Backend Server trung gian
-│   ├── app.py                          # Flask & Built-in HTTP Server (xử lý /summarize & /chat)
-│   └── requirements.txt                # Thư viện Python phụ thuộc
-└── android-client/                     # Mã nguồn ứng dụng Android (Kotlin + Jetpack Compose)
+│   ├── app.py                          # HTTP Server xử lý /summarize và /chat
+│   └── requirements.txt                # Danh sách thư viện Python phụ thuộc
+└── android-client/                     # Ứng dụng Android (Kotlin + Jetpack Compose)
     └── app/src/main/
-        ├── AndroidManifest.xml         # Quyền INTERNET, CLEAR_TEXT & Network Security
+        ├── AndroidManifest.xml         # Khai báo quyền Internet và cấu hình bảo mật
         ├── res/xml/
-        │   └── network_security_config.xml # Cấu hình bảo mật mạng
+        │   └── network_security_config.xml # Cấu hình cho phép kết nối mạng nội bộ
         └── java/com/thanhbinh/englishaiapp/
             ├── data/
-            │   ├── model/ChatMessage.kt # Model dữ liệu tin nhắn Chat
-            │   └── local/              # Room Database, DAOs & Entities
+            │   ├── model/ChatMessage.kt # Data class biểu diễn tin nhắn trò chuyện
+            │   └── local/              # Quản trị cơ sở dữ liệu Room (Entity, DAO, DB)
             ├── presentation/
             │   ├── components/
-            │   │   ├── BottomNavigationBar.kt
-            │   │   └── ServerConfigDialog.kt # Hộp thoại chuyển đổi USB / LAN IP
+            │   │   ├── BottomNavigationBar.kt # Thanh điều hướng chính
+            │   │   └── ServerConfigDialog.kt  # Hộp thoại cấu hình IP kết nối linh hoạt
             │   ├── navigation/         # Điều hướng màn hình (NavGraph, Screen)
             │   ├── screens/
-            │   │   ├── HomeScreen/     # Màn hình chính
-            │   │   ├── Screens_Chat/   # Màn hình Chat AI (ChatAIScreen)
-            │   │   └── Screens_Scan/   # Màn hình Quét & Tóm tắt AI (ScanResultScreen)
+            │   │   ├── HomeScreen/     # Màn hình trang chủ
+            │   │   ├── Screens_Chat/   # Giao diện Chat AI (ChatAIScreen)
+            │   │   └── Screens_Scan/   # Giao diện Quét tài liệu & Tóm tắt AI
             │   └── viewmodel/
-            │       ├── chat/ChatViewModel.kt       # ViewModel xử lý hội thoại AI
-            │       └── scan/ScanResultViewModel.kt # ViewModel xử lý tóm tắt AI
+            │       ├── chat/ChatViewModel.kt       # Xử lý logic và trạng thái hội thoại
+            │       └── scan/ScanResultViewModel.kt # Xử lý logic và trạng thái tóm tắt
             └── utils/
-                └── AppConfig.kt        # Cấu hình IP Server, Port, Timeouts & Auto-fallback
+                └── AppConfig.kt        # Cấu hình IP, Port, Timeout và Auto-fallback
 ```
 
 ---
 
-## 💻 Công nghệ sử dụng
+## 5. Công nghệ & Thư viện sử dụng
 
-- **Frontend Android**: Kotlin, Jetpack Compose, Material 3, Navigation Compose, Coroutines & StateFlow.
-- **Local Database & Network**: Room DB, OkHttpClient (hỗ trợ Auto-fallback USB / LAN, 10s timeout).
-- **Backend & AI Gateway**: Python (Flask / http.server).
-- **AI Core**: Ollama running **Llama 3.1** (Meta AI) / Llama 3.2.
+- **Frontend Android**: Kotlin 2.1, Jetpack Compose, Material 3, Navigation Compose, Coroutines, StateFlow.
+- **Lưu trữ & Mạng**: Room Database, OkHttp 4.12 (hỗ trợ Auto-fallback USB / LAN, timeout 10 giây).
+- **Backend Gateway**: Python 3 (tương thích Flask và Built-in HTTP Server).
+- **AI Core & Mô hình**: Ollama, Meta Llama 3.1 (8B) / Llama 3.2 (3B).
