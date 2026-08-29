@@ -110,24 +110,59 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
 
 @Composable
 fun TranslateScreen() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? AppCompatActivity
+    val fm = activity?.supportFragmentManager
+
+    DisposableEffect(Unit) {
+        onDispose {
+            fm?.let {
+                if (!it.isStateSaved && !it.isDestroyed) {
+                    val existing = it.findFragmentByTag("TranslateFragment")
+                        ?: it.findFragmentById(com.thanhbinh.englishaiapp.R.id.translate_fragment_container)
+                    if (existing != null) {
+                        it.beginTransaction().remove(existing).commitAllowingStateLoss()
+                    }
+                }
+            }
+        }
+    }
+
     AndroidView(
         modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            FragmentContainerView(context).apply {
+        factory = { ctx ->
+            FragmentContainerView(ctx).apply {
                 id = com.thanhbinh.englishaiapp.R.id.translate_fragment_container
                 layoutParams = android.view.ViewGroup.LayoutParams(
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT
                 )
+                val act = ctx as? AppCompatActivity
+                val fragmentManager = act?.supportFragmentManager
+                if (fragmentManager != null && !fragmentManager.isDestroyed) {
+                    val existing = fragmentManager.findFragmentByTag("TranslateFragment")
+                        ?: fragmentManager.findFragmentById(id)
+                    val tx = fragmentManager.beginTransaction()
+                    if (existing != null) {
+                        tx.remove(existing)
+                    }
+                    tx.replace(id, TranslateFragment.newInstance(), "TranslateFragment")
+                        .commitAllowingStateLoss()
+                }
             }
         },
         update = { view ->
-            val activity = view.context as? AppCompatActivity
-            val fm = activity?.supportFragmentManager ?: return@AndroidView
-            val existing = fm.findFragmentById(view.id)
-            if (existing == null) {
-                fm.beginTransaction()
-                    .replace(view.id, TranslateFragment.newInstance(), "TranslateFragment")
+            val act = view.context as? AppCompatActivity
+            val fragmentManager = act?.supportFragmentManager ?: return@AndroidView
+            if (fragmentManager.isDestroyed) return@AndroidView
+            val currentFrag = fragmentManager.findFragmentById(view.id)
+            if (currentFrag == null || currentFrag.view == null) {
+                val existing = fragmentManager.findFragmentByTag("TranslateFragment")
+                val tx = fragmentManager.beginTransaction()
+                if (existing != null) {
+                    tx.remove(existing)
+                }
+                tx.replace(view.id, TranslateFragment.newInstance(), "TranslateFragment")
                     .commitAllowingStateLoss()
             }
         }
@@ -136,27 +171,61 @@ fun TranslateScreen() {
 
 @Composable
 fun VocabularyScreen() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val activity = context as? AppCompatActivity
+    val fm = activity?.supportFragmentManager
+
+    DisposableEffect(Unit) {
+        onDispose {
+            fm?.let {
+                if (!it.isStateSaved && !it.isDestroyed) {
+                    val existing = it.findFragmentByTag("VocabularyFragment")
+                        ?: it.findFragmentById(com.thanhbinh.englishaiapp.R.id.vocabulary_fragment_container)
+                    if (existing != null) {
+                        it.beginTransaction().remove(existing).commitAllowingStateLoss()
+                    }
+                }
+            }
+        }
+    }
+
     AndroidView(
         modifier = Modifier.fillMaxSize(),
-        factory = { context ->
-            FragmentContainerView(context).apply {
+        factory = { ctx ->
+            FragmentContainerView(ctx).apply {
                 id = com.thanhbinh.englishaiapp.R.id.vocabulary_fragment_container
                 layoutParams = android.view.ViewGroup.LayoutParams(
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                     android.view.ViewGroup.LayoutParams.MATCH_PARENT
                 )
+                val act = ctx as? AppCompatActivity
+                val fragmentManager = act?.supportFragmentManager
+                if (fragmentManager != null && !fragmentManager.isDestroyed) {
+                    val existing = fragmentManager.findFragmentByTag("VocabularyFragment")
+                        ?: fragmentManager.findFragmentById(id)
+                    val tx = fragmentManager.beginTransaction()
+                    if (existing != null) {
+                        tx.remove(existing)
+                    }
+                    tx.replace(id, VocabularyFragment(), "VocabularyFragment")
+                        .commitAllowingStateLoss()
+                }
             }
         },
         update = { view ->
-            val activity = view.context as? AppCompatActivity
-            val fm = activity?.supportFragmentManager ?: return@AndroidView
-            val existing = fm.findFragmentById(view.id)
-            if (existing != null) {
-                fm.beginTransaction().remove(existing).commitNowAllowingStateLoss()
+            val act = view.context as? AppCompatActivity
+            val fragmentManager = act?.supportFragmentManager ?: return@AndroidView
+            if (fragmentManager.isDestroyed) return@AndroidView
+            val currentFrag = fragmentManager.findFragmentById(view.id)
+            if (currentFrag == null || currentFrag.view == null) {
+                val existing = fragmentManager.findFragmentByTag("VocabularyFragment")
+                val tx = fragmentManager.beginTransaction()
+                if (existing != null) {
+                    tx.remove(existing)
+                }
+                tx.replace(view.id, VocabularyFragment(), "VocabularyFragment")
+                    .commitAllowingStateLoss()
             }
-            fm.beginTransaction()
-                .replace(view.id, VocabularyFragment(), "VocabularyFragment")
-                .commitAllowingStateLoss()
         }
     )
 }
