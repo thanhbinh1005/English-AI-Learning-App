@@ -1,5 +1,6 @@
 package com.thanhbinh.englishaiapp
 
+import com.thanhbinh.englishaiapp.data.local.entity.ChatMessageEntity
 import com.thanhbinh.englishaiapp.data.model.ChatMessage
 import com.thanhbinh.englishaiapp.utils.AppConfig
 import org.junit.Assert.*
@@ -40,6 +41,27 @@ class ChatMessageTest {
         )
         assertTrue(message.isError)
         assertFalse(message.isUser)
+    }
+
+    @Test
+    fun testChatMessageEntity_mapping() {
+        val original = ChatMessage(
+            id = "test-uuid-1234",
+            text = "Hello Llama AI",
+            isUser = true,
+            timestamp = 1700000000000L,
+            isError = false
+        )
+
+        val entity = ChatMessageEntity.fromChatMessage(original)
+        assertEquals(original.id, entity.id)
+        assertEquals(original.text, entity.text)
+        assertEquals(original.isUser, entity.isUser)
+        assertEquals(original.timestamp, entity.timestamp)
+        assertEquals(original.isError, entity.isError)
+
+        val converted = entity.toChatMessage()
+        assertEquals(original, converted)
     }
 
     @Test

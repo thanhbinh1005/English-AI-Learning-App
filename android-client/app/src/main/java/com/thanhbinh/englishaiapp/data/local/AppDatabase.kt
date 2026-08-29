@@ -12,9 +12,10 @@ import com.thanhbinh.englishaiapp.data.local.entity.*
         ScannedDocEntity::class,
         CollectionEntity::class,
         VocabularyEntity::class,
-        HistoryItem::class
+        HistoryItem::class,
+        ChatMessageEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -23,6 +24,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun collectionDao(): CollectionDao
     abstract fun vocabularyDao(): VocabularyDao
     abstract fun translationHistoryDao(): TranslationHistoryDao
+    abstract fun chatHistoryDao(): ChatHistoryDao
 
     companion object {
         @Volatile

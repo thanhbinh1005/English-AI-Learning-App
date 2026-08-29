@@ -1,27 +1,22 @@
 package com.thanhbinh.englishaiapp.presentation.viewmodel.chat
 
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.thanhbinh.englishaiapp.data.local.AppDatabase
+import com.thanhbinh.englishaiapp.data.local.entity.ChatMessageEntity
 import com.thanhbinh.englishaiapp.data.model.ChatMessage
 import com.thanhbinh.englishaiapp.utils.AppConfig
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 
-class ChatViewModel : ViewModel() {
+class ChatViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val chatHistoryDao = AppDatabase.getDatabase(application).chatHistoryDao()
 
     private val initialWelcomeMessage = ChatMessage(
         text = "Xin chào! 👋 Mình là Trợ lý AI Ngôn ngữ chạy trên mô hình Llama 3.1.\n" +
@@ -38,12 +33,22 @@ class ChatViewModel : ViewModel() {
     private val _inputText = MutableStateFlow("")
     val inputText = _inputText.asStateFlow()
 
-    private val httpClient: OkHttpClient by lazy {
-        OkHttpClient.Builder()
-            .connectTimeout(AppConfig.CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .readTimeout(AppConfig.READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .writeTimeout(AppConfig.WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .build()
+    init {
+        loadChatHistory()
+    }
+
+    private fun loadChatHistory() {
+        viewModelScope.launch {
+            chatHistoryDao.getAllMessages().collect { entities ->
+                if (entities.isEmpty()) {
+                    withContext(Dispatchers.IO) {
+                        chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(initialWelcomeMessage))
+                    }
+                } else {
+                    _messages.value = entities.map { it.toChatMessage() }
+                }
+            }
+        }
     }
 
     fun onInputTextChanged(newText: String) {
@@ -58,12 +63,14 @@ class ChatViewModel : ViewModel() {
             return
         }
 
-        // 1. Thêm tin nhắn của người dùng ngay lập tức
+        // 1. Thêm tin nhắn của người dùng và lưu vào Room DB
         val userMsg = ChatMessage(
             text = trimmedMessage,
             isUser = true
         )
-        _messages.value = _messages.value + userMsg
+        viewModelScope.launch(Dispatchers.IO) {
+            chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(userMsg))
+        }
 
         // Reset ô nhập nếu lấy từ inputText
         if (customText == null) {
@@ -100,14 +107,18 @@ class ChatViewModel : ViewModel() {
                         text = finalReply,
                         isUser = false
                     )
-                    _messages.value = _messages.value + aiMsg
+                    viewModelScope.launch(Dispatchers.IO) {
+                        chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(aiMsg))
+                    }
                 } catch (e: Exception) {
                     val parseErrorMsg = ChatMessage(
                         text = "Lỗi phân tích cú pháp phản hồi: ${e.message}",
                         isUser = false,
                         isError = true
                     )
-                    _messages.value = _messages.value + parseErrorMsg
+                    viewModelScope.launch(Dispatchers.IO) {
+                        chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(parseErrorMsg))
+                    }
                 }
             },
             onFailure = { errorMessage ->
@@ -117,13 +128,18 @@ class ChatViewModel : ViewModel() {
                     isUser = false,
                     isError = true
                 )
-                _messages.value = _messages.value + errorMsg
+                viewModelScope.launch(Dispatchers.IO) {
+                    chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(errorMsg))
+                }
             }
         )
     }
 
     fun clearChat() {
-        _messages.value = listOf(initialWelcomeMessage)
+        viewModelScope.launch(Dispatchers.IO) {
+            chatHistoryDao.clearHistory()
+            chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(initialWelcomeMessage))
+        }
         _isLoading.value = false
         _inputText.value = ""
     }
