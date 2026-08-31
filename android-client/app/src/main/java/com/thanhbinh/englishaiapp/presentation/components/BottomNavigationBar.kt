@@ -4,6 +4,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.thanhbinh.englishaiapp.presentation.navigation.bottomNavItems
 
@@ -19,7 +20,7 @@ fun BottomNavigationBar(navController: NavController) {
                 selected = isSelected,
                 onClick = {
                     navController.navigate(screen.route) {
-                        popUpTo(navController.graph.startDestinationId) {
+                        popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
                         launchSingleTop = true

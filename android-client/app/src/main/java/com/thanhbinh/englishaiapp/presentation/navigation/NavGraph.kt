@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.FragmentContainerView
+import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -25,6 +27,16 @@ import com.thanhbinh.englishaiapp.presentation.screens.Screens_Scan.ScanScreen
 import com.thanhbinh.englishaiapp.ui.fragment.TranslateFragment
 import com.thanhbinh.englishaiapp.ui.fragment.VocabularyFragment
 
+private fun NavController.navigateToTab(route: String) {
+    navigate(route) {
+        popUpTo(graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
@@ -36,10 +48,10 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
         // --- 1. MÀN HÌNH CHÍNH (HOME) ---
         composable(Screen.Home.route) {
             HomeScreen(
-                onNavigateToTranslate = { navController.navigate(Screen.Translate.route) },
-                onNavigateToScan = { navController.navigate(Screen.Scan.route) },
-                onNavigateToVocabulary = { navController.navigate(Screen.Library.route) },
-                onNavigateToChatAi = { navController.navigate(Screen.ChatAI.route) }
+                onNavigateToTranslate = { navController.navigateToTab(Screen.Translate.route) },
+                onNavigateToScan = { navController.navigateToTab(Screen.Scan.route) },
+                onNavigateToVocabulary = { navController.navigateToTab(Screen.Library.route) },
+                onNavigateToChatAi = { navController.navigateToTab(Screen.ChatAI.route) }
             )
         }
 
@@ -48,9 +60,7 @@ fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
         composable(Screen.ChatAI.route) {
             ChatAIScreen(
                 onNavigateBack = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
-                    }
+                    navController.navigateToTab(Screen.Home.route)
                 }
             )
         }
