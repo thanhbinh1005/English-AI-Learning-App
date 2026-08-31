@@ -438,7 +438,7 @@ fun ChatAIScreen(
                 isLoading = isLoading,
                 onSendMessage = {
                     keyboardController?.hide()
-                    viewModel.sendMessage(inputText)
+                    viewModel.sendMessage()
                 }
             )
         }

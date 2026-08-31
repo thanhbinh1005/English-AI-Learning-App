@@ -191,10 +191,8 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
             chatHistoryDao.insertMessage(ChatMessageEntity.fromChatMessage(userMsg, activeSessionId))
         }
 
-        // Reset ô nhập nếu lấy từ inputText
-        if (customText == null) {
-            _inputText.value = ""
-        }
+        // Reset ô nhập
+        _inputText.value = ""
 
         // 2. Bật trạng thái đang xử lý (loading / typing animation)
         _isLoading.value = true
