@@ -343,7 +343,7 @@ fun ChatAIScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "Llama 3.1",
+                                    text = "Llama 3.2",
                                     fontSize = 11.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -481,7 +481,7 @@ fun ChatHeaderBanner() {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Mô hình ngôn ngữ lớn Llama 3.1 hỗ trợ giải đáp & luyện tập 24/7.",
+                    text = "Mô hình ngôn ngữ lớn Llama 3.2 hỗ trợ giải đáp & luyện tập 24/7.",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

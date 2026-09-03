@@ -37,7 +37,15 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
     val currentDocId = _currentDocId.asStateFlow()
 
     // HÀM 1: LƯU MỚI HOÀN TOÀN (Ép buộc tạo dòng mới)
-    fun saveNewDocument(name: String, content: String, type: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun saveNewDocument(
+        name: String,
+        content: String,
+        translatedText: String = "",
+        summaryText: String = "",
+        type: String = "Word",
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 // Kiểm tra trùng tên
@@ -51,6 +59,8 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
                     id = 0, // ID 0 để Room tự sinh ID mới
                     fileName = name,
                     content = content,
+                    translatedText = translatedText,
+                    summaryText = summaryText,
                     fileType = type,
                     createdAt = System.currentTimeMillis(),
                     fileSize = "${content.length / 1024} KB",
@@ -66,7 +76,15 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     // HÀM 2: CẬP NHẬT (Chỉ ghi đè lên file đang mở)
-    fun updateCurrentDocument(name: String, content: String, type: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun updateCurrentDocument(
+        name: String,
+        content: String,
+        translatedText: String = "",
+        summaryText: String = "",
+        type: String = "Word",
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
         val id = _currentDocId.value
         if (id == 0) return // Không có ID thì không cập nhật
 
@@ -84,6 +102,8 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
                     val updatedDoc = existingDoc.copy(
                         fileName = name,
                         content = content,
+                        translatedText = translatedText,
+                        summaryText = summaryText,
                         fileType = type,
                         createdAt = System.currentTimeMillis()
                     )
@@ -111,7 +131,7 @@ class ScanResultViewModel(application: Application) : AndroidViewModel(applicati
         _currentDocId.value = id
     }
 
-    // Tóm tắt văn bản bằng Llama 3.1
+    // Tóm tắt văn bản bằng Llama 3.2
     fun summarizeText(text: String, onResult: (String) -> Unit) {
         if (text.isBlank()) return onResult("Văn bản rỗng")
 

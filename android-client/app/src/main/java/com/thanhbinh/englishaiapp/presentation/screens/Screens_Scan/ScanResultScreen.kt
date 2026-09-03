@@ -52,6 +52,19 @@ fun ScanResultScreen(
     var fileName by remember { mutableStateOf("") }
     var textState by remember { mutableStateOf(scannedText) }
 
+    // Tab states: 0 = Nguyên bản, 1 = Dịch thuật, 2 = Tóm tắt AI
+    var selectedTab by remember { mutableIntStateOf(0) }
+
+    // Translation states
+    var sourceLanguage by remember { mutableStateOf("Nhận diện ngôn ngữ") }
+    var targetLanguage by remember { mutableStateOf("Tiếng Việt") }
+    var translatedText by remember { mutableStateOf("") }
+    var isTranslating by remember { mutableStateOf(false) }
+
+    // Summary states
+    var summaryText by remember { mutableStateOf("") }
+    var isSummarizing by remember { mutableStateOf(false) }
+
     // TTS Setup
     var tts: TextToSpeech? by remember { mutableStateOf(null) }
     DisposableEffect(context) {
@@ -75,6 +88,8 @@ fun ScanResultScreen(
             viewModel.getDocumentById(docId) { doc ->
                 fileName = doc.fileName
                 textState = doc.content
+                translatedText = doc.translatedText
+                summaryText = doc.summaryText
             }
         } else {
             // Nếu docId = 0, đây là file MỚI QUÉT từ camera.
@@ -85,19 +100,6 @@ fun ScanResultScreen(
             }
         }
     }
-
-    // Tab states: 0 = Nguyên bản, 1 = Dịch thuật, 2 = Tóm tắt AI
-    var selectedTab by remember { mutableIntStateOf(0) }
-
-    // Translation states
-    var sourceLanguage by remember { mutableStateOf("Nhận diện ngôn ngữ") }
-    var targetLanguage by remember { mutableStateOf("Tiếng Việt") }
-    var translatedText by remember { mutableStateOf("") }
-    var isTranslating by remember { mutableStateOf(false) }
-
-    // Summary states
-    var summaryText by remember { mutableStateOf("") }
-    var isSummarizing by remember { mutableStateOf(false) }
 
     var showServerConfigDialog by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -126,12 +128,12 @@ fun ScanResultScreen(
                         )
                     }
                     TextButton(onClick = {
-                        val contentToSave = when (selectedTab) {
-                            1 -> if (translatedText.isNotEmpty()) translatedText else textState
-                            2 -> if (summaryText.isNotEmpty()) summaryText else textState
-                            else -> textState
-                        }
-                        viewModel.saveNewDocument(fileName, contentToSave, "Word",
+                        viewModel.saveNewDocument(
+                            name = fileName,
+                            content = textState,
+                            translatedText = translatedText,
+                            summaryText = summaryText,
+                            type = "Word",
                             onSuccess = {
                                 Toast.makeText(context, "Đã lưu tệp mới!", Toast.LENGTH_SHORT).show()
                                 onNavigateBack()
@@ -404,7 +406,7 @@ fun ScanResultScreen(
                                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
-                                        text = "Đang phân tích & tóm tắt với Llama 3.1...",
+                                        text = "Đang phân tích & tóm tắt với Llama 3.2...",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -447,12 +449,12 @@ fun ScanResultScreen(
                 // Nút Cập nhật
                 Button(
                     onClick = {
-                        val contentToUpdate = when (selectedTab) {
-                            1 -> if (translatedText.isNotEmpty()) translatedText else textState
-                            2 -> if (summaryText.isNotEmpty()) summaryText else textState
-                            else -> textState
-                        }
-                        viewModel.updateCurrentDocument(fileName, contentToUpdate, "Word",
+                        viewModel.updateCurrentDocument(
+                            name = fileName,
+                            content = textState,
+                            translatedText = translatedText,
+                            summaryText = summaryText,
+                            type = "Word",
                             onSuccess = {
                                 Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
                                 onNavigateBack()

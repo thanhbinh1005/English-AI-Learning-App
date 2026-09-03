@@ -12,5 +12,7 @@ data class ScannedDocEntity(
     val createdAt: Long, // Lưu timestamp để sắp xếp ngày tháng
     val fileType: String, // PDF hoặc WORD
     val filePath: String,  // Đường dẫn lưu file thực tế trong máy
-    val content: String
+    val content: String,   // Nội dung nguyên văn (OCR)
+    val translatedText: String = "", // Nội dung bản dịch
+    val summaryText: String = ""    // Nội dung tóm tắt AI
 )

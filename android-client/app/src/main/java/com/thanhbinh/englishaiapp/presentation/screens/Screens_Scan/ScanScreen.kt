@@ -185,7 +185,7 @@ fun ScanScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Chụp tài liệu mới bằng camera hoặc mở văn bản mẫu để trải nghiệm tính năng Tóm tắt bằng AI (Llama 3.1).",
+                            text = "Chụp tài liệu mới bằng camera hoặc mở văn bản mẫu để trải nghiệm tính năng Tóm tắt bằng AI (Llama 3.2).",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center,
@@ -196,7 +196,7 @@ fun ScanScreen(
                             onClick = {
                                 val sampleText = """
                                 Artificial intelligence (AI) is transforming language learning by providing personalized, interactive, and adaptive learning experiences.
-                                With large language models like Llama 3.1, learners can practice natural conversations, ask grammar questions, and receive instant explanations.
+                                With large language models like Llama 3.2, learners can practice natural conversations, ask grammar questions, and receive instant explanations.
                                 AI can summarize lengthy documents, highlight key points, and extract important vocabulary for learners.
                                 Moreover, automated speech recognition and text-to-speech tools enable students to practice listening and pronunciation anywhere, anytime.
                                 While AI cannot completely replace human interaction, it serves as a powerful 24/7 tutor that accelerates fluency and confidence.

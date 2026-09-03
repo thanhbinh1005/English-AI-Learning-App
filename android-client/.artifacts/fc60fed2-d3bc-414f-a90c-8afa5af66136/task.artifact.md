@@ -1,5 +1,5 @@
-- [x] Localize `activity_new_collection.xml`
-- [x] Localize `fragment_translate.xml`
-- [x] Localize `bottom_sheet_languages.xml`
-- [x] Update `TranslateFragment.java` with Vietnamese language names and status messages
-- [x] Verify build and UI consistency
+- [x] Add `translatedText` and `summaryText` fields to `ScannedDocEntity.kt`
+- [x] Increment Room Database version to 8 in `AppDatabase.kt`
+- [x] Update `saveNewDocument` and `updateCurrentDocument` in `ScanResultViewModel.kt`
+- [x] Update document save/update and load logic in `ScanResultScreen.kt`
+- [x] Verify build status

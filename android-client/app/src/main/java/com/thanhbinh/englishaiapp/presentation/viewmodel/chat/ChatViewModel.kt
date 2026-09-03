@@ -25,7 +25,7 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     private val chatSessionDao = db.chatSessionDao()
 
     private val initialWelcomeMessage = ChatMessage(
-        text = "Xin chào! 👋 Mình là Trợ lý AI Ngôn ngữ chạy trên mô hình Llama 3.1.\n" +
+        text = "Xin chào! 👋 Mình là Trợ lý AI Ngôn ngữ chạy trên mô hình Llama 3.2.\n" +
                 "Bạn có thể hỏi mình bất cứ câu hỏi nào về ngữ pháp, luyện hội thoại tiếng Anh, hoặc nhờ giải thích từ vựng nhé!",
         isUser = false
     )

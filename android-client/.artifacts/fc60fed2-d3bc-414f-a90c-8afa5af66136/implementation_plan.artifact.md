@@ -1,27 +1,54 @@
-# Plan: Fix MainActivity and Theme Red Markers
+# Plan: Preserve 3 Document States (Original, Translation, AI Summary) on Save/Update
 
-The user reported errors in `MainActivity.kt`. Although the project builds successfully, the IDE/Linter is showing "red markers" (unresolved references) because the analyzer is failing to resolve symbols across different files in the same package (`com.thanhbinh.englishaiapp.ui.theme`).
+When saving or updating a scanned document, the app currently only saves the content of whichever tab is active, erasing the other 2 states. Furthermore, when loading a saved document, `translatedText` and `summaryText` are lost because `ScannedDocEntity` only holds a single `content` field.
+
+This plan updates the Room database schema and ViewModel/UI logic so that all 3 states (**Nguyên văn**, **Dịch thuật**, and **Tóm tắt AI**) are saved and restored seamlessly.
 
 ## Proposed Changes
 
-### UI / Theme
+### Data Layer & Room Database
 
-#### [MODIFY] [Theme.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/ui/theme/Theme.kt)
-- Move color definitions from `Color.kt` directly into `Theme.kt` to help the analyzer resolve them.
-- Use `AppTypography` (already renamed from `Typography` to avoid class name shadowing).
+#### [MODIFY] [ScannedDocEntity.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/data/local/entity/ScannedDocEntity.kt)
+- Add two new fields to `ScannedDocEntity`:
+  - `val translatedText: String = ""`
+  - `val summaryText: String = ""`
 
-#### [DELETE] [Color.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/ui/theme/Color.kt)
-- Redundant once colors are in `Theme.kt`.
+#### [MODIFY] [AppDatabase.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/data/local/AppDatabase.kt)
+- Increment Room Database version from `7` to `8`.
 
-#### [MODIFY] [MainActivity.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/MainActivity.kt)
-- Clean up redundant `MaterialTheme` nesting.
-- Ensure standard Composable structure.
+---
+
+### ViewModels
+
+#### [MODIFY] [ScanResultViewModel.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/presentation/viewmodel/scan/ScanResultViewModel.kt)
+- Update `saveNewDocument` to accept `translatedText: String` and `summaryText: String`.
+- Update `updateCurrentDocument` to accept `translatedText: String` and `summaryText: String` and copy them into `updatedDoc`.
+
+---
+
+### UI Layer
+
+#### [MODIFY] [ScanResultScreen.kt](file:///D:/HaUI/Phat_trien_UDDD/English-AI-Learning-App/android-client/app/src/main/java/com/thanhbinh/englishaiapp/presentation/screens/Screens_Scan/ScanResultScreen.kt)
+- When loading a document by `docId != 0`:
+  - Set `textState = doc.content`
+  - Set `translatedText = doc.translatedText`
+  - Set `summaryText = doc.summaryText`
+- When saving a new document ("LƯU MỚI"):
+  - Pass `textState`, `translatedText`, and `summaryText` into `saveNewDocument`.
+- When updating an existing document ("Cập nhật file"):
+  - Pass `textState`, `translatedText`, and `summaryText` into `updateCurrentDocument`.
+
+---
 
 ## Verification Plan
 
-### Automated Tests
-- Run `./gradlew app:assembleDebug` to ensure it still builds.
-- Use `analyze_file` on `MainActivity.kt` and `Theme.kt` to verify that the "unresolved reference" errors are gone.
+### Automated Verification
+- Run `app:assembleDebug` via `gradle_build` to verify successful compilation.
 
 ### Manual Verification
-- Check the IDE for any remaining red markers.
+- Open Scan screen, scan a document or open sample text.
+- Switch to "Dịch thuật" tab and generate translation.
+- Switch to "Tóm tắt AI" tab and generate summary.
+- Click "LƯU MỚI".
+- Open the newly saved file from "Bản quét của tôi".
+- Click through all 3 tabs ("Nguyên bản", "Dịch thuật", "Tóm tắt AI") and verify that all 3 tabs contain their saved texts intact.
