@@ -1,5 +1,5 @@
-- [x] Add `translatedText` and `summaryText` fields to `ScannedDocEntity.kt`
-- [x] Increment Room Database version to 8 in `AppDatabase.kt`
-- [x] Update `saveNewDocument` and `updateCurrentDocument` in `ScanResultViewModel.kt`
-- [x] Update document save/update and load logic in `ScanResultScreen.kt`
-- [x] Verify build status
+- [ ] Create `README.md` in repository root
+- [ ] Stage and commit `README.md` to git
+- [ ] Create git tag `v1.0.0`
+- [ ] Push commits and tag `v1.0.0` to GitHub
+- [ ] Verify release tag and push status
